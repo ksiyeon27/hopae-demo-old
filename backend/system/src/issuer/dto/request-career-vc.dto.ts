@@ -7,5 +7,5 @@ export class RequestCareerVcDTO{
     @IsString()
     readonly orignal_nonce: string;
     @IsString()
-    readonly encypted_nonce: string;
+    readonly encrypted_nonce: string;
 }
