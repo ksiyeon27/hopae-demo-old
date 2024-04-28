@@ -8,9 +8,9 @@ export class IssuerController {
     constructor(readonly issuerService: IssuerService) {}
 
     @Post()
-    request_vc(@Body() vc_request_data: RequestCareerVcDTO): VC{
+    async request_vc(@Body() vc_request_data: RequestCareerVcDTO): Promise<VC>{
         this.issuerService.start()
-        return this.issuerService.request_vc(vc_request_data)
+        return await this.issuerService.request_vc(vc_request_data)
     }
 
 }
