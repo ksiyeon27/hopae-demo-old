@@ -11,6 +11,7 @@ export class WalletService {
   async verify_career_vp(
     career_vp_verify_data: VerifyCareerVpDTO,
   ): Promise<boolean> {
+    console.log('holder');
     const holder = this.jwtService.getHolder();
     console.log(holder.id);
     console.log(career_vp_verify_data);

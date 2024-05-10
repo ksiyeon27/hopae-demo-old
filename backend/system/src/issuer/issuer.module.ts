@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { IssuerController } from './issuer.controller';
 import { IssuerService } from './issuer.service';
-import { JwtService } from 'src/jwt/jwt.service';
+import { JwtModule } from 'src/jwt/jwt.module';
 
 @Module({
+  imports: [JwtModule],
   controllers: [IssuerController],
-  providers: [IssuerService, JwtService],
+  providers: [IssuerService],
 })
 export class IssuerModule {}
