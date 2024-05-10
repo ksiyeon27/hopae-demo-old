@@ -1,9 +1,7 @@
-export const extractIssuer = (vc: string) => {
-  return vc;
-};
+import { CredentialInfo } from '@/entities/credentialInfo';
 
-export const extractFields = (vc: string) => {
-  return vc;
+export const extractData = (vc: string): CredentialInfo | null => {
+  return null;
 };
 
 export const makeVP = (vc: string, fields: string[]) => {

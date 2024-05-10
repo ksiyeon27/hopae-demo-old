@@ -1,8 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/types';
-import React, { FC } from 'react';
-import { Dimensions, FlatList, Text, View } from 'react-native';
+import React, { FC, useEffect, useState } from 'react';
+import { Alert, Dimensions, FlatList, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CredentialInfo } from '@/entities/credentialInfo';
+import { extractData } from '@/utils/jwt';
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 const dummyCredentials = [
@@ -29,6 +31,22 @@ const dummyCredentials = [
 const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
   const vw = Dimensions.get('window').width;
   const vh = Dimensions.get('window').height;
+  const [credentials, setCredentials] = useState<CredentialInfo[]>([]);
+
+  useEffect(() => {
+    const _getData = async () => {
+      const creds = await AsyncStorage.getItem('credentials');
+      setCredentials(
+        (creds ? JSON.parse(creds) : []).map((c: string) => extractData(c)),
+      );
+    };
+    _getData().catch((e) => {
+      console.error(e);
+      Alert.alert('인증서 정보 불러오기에 실패했습니다');
+      navigation.goBack();
+    });
+  }, [navigation]);
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white', padding: 16 }}>
       <View
@@ -49,7 +67,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
           borderColor: '#d0d0d0',
         }}>
         <FlatList
-          data={dummyCredentials}
+          data={credentials}
           renderItem={({ item, index }) => {
             return (
               <View
@@ -67,8 +85,13 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
                 <Text style={{ fontSize: 20, color: 'black' }}>
                   {item.issuer}
                 </Text>
+                {item.fields.map((f) => {
+                  return (
+                    <Text style={{ fontSize: 18, color: 'black' }}>{f}</Text>
+                  );
+                })}
                 <Text style={{ fontSize: 20, color: 'black' }}>
-                  {item.create_time.toLocaleDateString('ko-KR')}
+                  {'유효기간 - ' + item.issueDate.toLocaleDateString('ko-KR')}
                 </Text>
               </View>
             );

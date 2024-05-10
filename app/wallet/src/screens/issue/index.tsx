@@ -3,30 +3,41 @@ import { RootStackParamList } from '@/navigation/types';
 import React, { FC, useEffect } from 'react';
 import { Alert, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { extractIssuer } from '@/utils/jwt';
+import { extractData } from '@/utils/jwt';
 import axios from 'axios';
 
 type IssueScreenProps = NativeStackScreenProps<RootStackParamList, 'Issue'>;
 const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
   const saveVC = async (vc: string) => {
-    const issuer = extractIssuer(vc);
-    try {
-      await AsyncStorage.setItem('vc-' + issuer, vc);
-    } catch (e) {
-      console.error(e);
+    const data = extractData(vc);
+    if (!data) {
+      Alert.alert('인증서가 잘못된 형식입니다');
       navigation.goBack();
+      return;
     }
+    const credentials = await AsyncStorage.getItem('credentials');
+    let credentialsArr = credentials ? JSON.parse(credentials) : [];
+    await AsyncStorage.setItem(
+      'credentials',
+      JSON.stringify([...credentialsArr, vc]),
+    );
   };
 
   useEffect(() => {
     console.log(route.params);
     axios.post(route.params.url, route.params.randomString).then((res) => {
-      saveVC(res.data);
-      Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
-      navigation.goBack();
+      saveVC(res.data)
+        .then(() => {
+          Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
+        })
+        .catch((e) => {
+          console.error(e);
+          Alert.alert('인증서 저장에 실패했습니다');
+        })
+        .finally(() => {
+          navigation.goBack();
+        });
     });
-    // call url
-    // and save vc
   }, [route.params]);
 
   return (
