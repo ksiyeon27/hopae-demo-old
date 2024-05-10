@@ -9,7 +9,7 @@ const Verifier1Page: FC = () => {
   const useDeepLink = () => {
     const url = "https://dummy.com"; // verifier 1 backend
     const uuid = v4();
-    const fields = ["name", "age"];
+    const fields = ["나이", "성별", "국가"];
     window.open(
       "wwwallet://verify?url=" +
         url +

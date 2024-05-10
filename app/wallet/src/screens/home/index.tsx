@@ -13,7 +13,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialInfo } from '@/entities/credentialInfo';
 import { extractData } from '@/utils/jwt';
-import window from '@react-navigation/native/lib/typescript/src/__mocks__/window';
 import { useIsFocused } from '@react-navigation/native';
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -36,7 +35,6 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
     _getData().catch((e) => {
       console.error(e);
       Alert.alert('인증서 정보 불러오기에 실패했습니다');
-      navigation.goBack();
     });
   }, [isFocused, flag]);
 
@@ -121,6 +119,25 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
           }}>
           <Text style={{ fontSize: 20, color: 'black' }}>
             {'인증서 발급받기(웹 자동 연결)'}
+          </Text>
+        </View>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Linking.openURL(
+            'https://f499-147-47-202-15.ngrok-free.app/verifier1',
+          );
+        }}>
+        <View
+          style={{
+            padding: 16,
+            marginTop: 16,
+            borderRadius: 16,
+            borderWidth: 2,
+            borderColor: '#d0d0d0',
+          }}>
+          <Text style={{ fontSize: 20, color: 'black' }}>
+            {'인증하기(웹 자동 연결)'}
           </Text>
         </View>
       </TouchableWithoutFeedback>

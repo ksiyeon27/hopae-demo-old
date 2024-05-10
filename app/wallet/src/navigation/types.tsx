@@ -6,7 +6,7 @@ export type IssueParams = {
 export type VerifyParams = {
   randomString: string;
   url: string;
-  fields: string[];
+  fields: string;
 };
 
 export type RootStackParamList = {

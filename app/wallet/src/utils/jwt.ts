@@ -12,6 +12,6 @@ export const extractData = (vc: string): CredentialInfo | null => {
   return dummyCredential;
 };
 
-export const makeVP = (vc: string, fields: string[]) => {
+export const makeVP = (vc: string, fields: string[], nonce: string) => {
   return vc;
 };

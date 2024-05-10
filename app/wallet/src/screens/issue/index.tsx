@@ -12,8 +12,24 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
   const saveVC = async (vc: string) => {
     const data = extractData(vc);
     if (!data) {
-      Alert.alert('인증서가 잘못된 형식입니다');
-      navigation.goBack();
+      Alert.alert(
+        '인증서가 잘못된 형식입니다',
+        '',
+        [
+          {
+            text: '확인',
+            onPress: () => {
+              navigation.goBack();
+            },
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () => {
+            navigation.goBack();
+          },
+        },
+      );
       return;
     }
     const credentials = await AsyncStorage.getItem('credentials');
@@ -22,14 +38,46 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
       'credentials',
       JSON.stringify([...credentialsArr, vc]),
     );
-    navigation.goBack();
+    Alert.alert(
+      '인증서가 발급되었습니다',
+      '',
+      [
+        {
+          text: '확인',
+          onPress: () => {
+            navigation.goBack();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {
+          navigation.goBack();
+        },
+      },
+    );
   };
 
   useEffect(() => {
-    console.log(route.params);
     if (!route.params.url || !route.params.randomString) {
-      Alert.alert('비정상적인 접근입니다');
-      navigation.goBack();
+      Alert.alert(
+        '비정상적인 접근입니다',
+        '',
+        [
+          {
+            text: '확인',
+            onPress: () => {
+              navigation.goBack();
+            },
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () => {
+            navigation.goBack();
+          },
+        },
+      );
       return;
     }
     saveVC('dumdumdummy');
@@ -54,7 +102,7 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
         style={{
           width: vw - 32,
           justifyContent: 'center',
-          alignItems: 'center',
+          padding: 16,
         }}>
         <Text style={{ fontSize: 28, color: 'black' }}>
           {'인증서를 발급중입니다...'}
