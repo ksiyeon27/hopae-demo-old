@@ -21,15 +21,6 @@ async function vptest() {
     kbSignAlg: "ES256",
     kbVerifier: await ES256.getVerifier(publicKey),
   });
-  const sdjwt2 = new SDJwtInstance({
-    verifier: await ES256.getVerifier(publicKey),
-    signAlg: "ES256",
-    hasher: digest,
-    hashAlg: "SHA-256",
-    saltGenerator: generateSalt,
-    kbSignAlg: "ES256",
-    kbVerifier: await ES256.getVerifier(publicKey),
-  });
 
   const claims = {
     iss: "경력 증명서를 발급해주는 회사",
@@ -73,6 +64,15 @@ async function vptest() {
   console.log("\npresentation\n");
   console.log(presentation);
 
+  const sdjwt2 = new SDJwtInstance({
+    verifier: await ES256.getVerifier(publicKey),
+    signAlg: "ES256",
+    hasher: digest,
+    hashAlg: "SHA-256",
+    saltGenerator: generateSalt,
+    kbSignAlg: "ES256",
+    kbVerifier: await ES256.getVerifier(publicKey),
+  });
   console.log(await sdjwt2.verify(presentation, ["department"], true));
   // console.log(1<2);
 }
