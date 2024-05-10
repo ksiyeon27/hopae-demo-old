@@ -2,8 +2,8 @@ import { RequestCareerVcDTO } from './dto/request-career-vc.dto';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { Career } from './entities/career.entity';
 import { Claims } from './dto/claims.dto';
-import { Player } from './entities/player.entity';
 import { JwtService } from 'src/jwt/jwt.service';
+import { PlayersDidData } from 'src/dto/players-did-data.dto';
 
 @Injectable()
 export class IssuerService {
@@ -12,10 +12,14 @@ export class IssuerService {
   private careers: Career[] = []; //DB table
   private certificates: string[] = []; //DB table
 
-  private issuer: Player;
+  async makePlayers(players_did_data: PlayersDidData) {
+    await this.jwtService.createPlayer(players_did_data.holder_did, 'holder');
+    await this.jwtService.createPlayer(players_did_data.issuer_did, 'issuer');
+    this.jwtService.getHolder();
+    this.jwtService.getIssuer();
+  }
 
   async start() {
-    this.issuer = await this.jwtService.create_player('issuer_did');
     this.careers.push({
       id: 'did1',
       ...{
@@ -56,6 +60,8 @@ export class IssuerService {
   async request_career_vc(
     career_vc_request_data: RequestCareerVcDTO,
   ): Promise<string> {
+    console.log('issuer');
+    this.jwtService.getIssuer();
     // 1. 홀더 검증 : DID resolver API 호출해서 did docs 얻어오고, 난수(vc_request_data.nonce) 복호화 시도
     // 제이가 만든 리졸버 이용
     // GET /did/{did}
@@ -102,7 +108,6 @@ export class IssuerService {
     const new_vc = this.jwtService.create_vc_jwt(
       vc_claims,
       new_vc_did,
-      this.issuer,
       career_vc_request_data.holder_did,
     );
 
