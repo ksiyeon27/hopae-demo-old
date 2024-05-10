@@ -4,17 +4,40 @@ import { Claims } from 'src/issuer/dto/claims.dto';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { DisclosureFrame } from '@sd-jwt/types';
 import * as crypto from 'crypto';
-import { Player } from 'src/issuer/entities/player.entity';
+import { Player } from 'src/entities/player.entity';
 
 @Injectable()
 export class JwtService {
-  async create_player(issuer_id: string): Promise<Player> {
+  private issuer;
+  private holder;
+
+  async createPlayer(player_id: string, type: string): Promise<Player> {
     const { privateKey, publicKey } = await ES256.generateKeyPair();
-    return new Player({
-      id: issuer_id,
+    const player = new Player({
+      id: player_id,
+      type: type,
       publicKey: publicKey,
       privateKey: privateKey,
     });
+    if (player.type === 'holder') {
+      this.holder = player;
+      // console.log(this.holder);
+    } else if (player.type === 'issuer') {
+      this.issuer = player;
+      // console.log(this.issuer);
+    }
+
+    return player;
+  }
+
+  getIssuer(): Player {
+    console.log(this.issuer);
+    return this.issuer;
+  }
+
+  getHolder(): Player {
+    console.log(this.holder);
+    return this.holder;
   }
 
   async createSignerVerifier(
@@ -29,13 +52,22 @@ export class JwtService {
   async create_vc_jwt(
     claims: Claims,
     vc_id: string,
-    issuer: Player,
     holder_did: string,
   ): Promise<string> {
+    const issuer = this.getIssuer();
+    console.log(issuer);
     const { signer, verifier } = await this.createSignerVerifier(
       issuer.privateKey,
       issuer.publicKey,
     );
+    // console.log('issuer.privateKey');
+    // console.log(issuer.privateKey);
+    // console.log('issuer.publicKey');
+    // console.log(issuer.publicKey);
+    // console.log('signer');
+    // console.log(signer);
+    // console.log('verifier');
+    // console.log(verifier);
 
     const sdjwt = new SDJwtVcInstance({
       signer,
@@ -66,7 +98,7 @@ export class JwtService {
       },
       disclosureFrame,
     );
-    console.log('encodedJwt:', credential);
+    // console.log('encodedJwt:', credential);
     // 위까지가 VC 발급하는
     // 아래는 확인용 validate, decode
 

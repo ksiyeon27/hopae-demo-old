@@ -5,6 +5,7 @@ export class Player {
     Object.assign(this, data);
   }
   id: string; //나의 did
+  type: string;
   publicKey: crypto.webcrypto.JsonWebKey; //나의 publicKey
   privateKey: crypto.webcrypto.JsonWebKey; //나의 privateKey
 }

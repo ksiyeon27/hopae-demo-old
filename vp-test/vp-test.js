@@ -53,11 +53,14 @@ async function vptest() {
 
   const credential = await sdjwt.issue(claims, disclosureFrame);
   console.log(credential);
+  // 여기까지가 VC 만들기 (credential <- jwt token 저장됨)
 
   const kbPayload = {
-    iat: Math.floor(Date.now() / 1000),
-    aud: "https://example.com",
-    nonce: "DiF0tB2VN-F73cnE3homjL2", // 그냥 아무렇게나 한거..
+    //key binding payload
+    //VP 에 추가되는 Payload
+    iat: Math.floor(Date.now() / 1000), //VP 만든 시각
+    aud: "https://example.com", //이 VP를 만든 사람의 DID
+    nonce: "DiF0tB2VN-F73cnE3homjL2", // Verifier에게서 받은 일회용 난수를 암호화한 것- 그냥 아무렇게나 한거..
   };
 
   const presentationFrame = {

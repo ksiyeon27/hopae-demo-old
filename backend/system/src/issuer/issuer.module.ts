@@ -4,8 +4,7 @@ import { IssuerService } from './issuer.service';
 import { JwtService } from 'src/jwt/jwt.service';
 
 @Module({
-    controllers: [IssuerController],
-    providers: [IssuerService, JwtService],
+  controllers: [IssuerController],
+  providers: [IssuerService, JwtService],
 })
 export class IssuerModule {}
-
