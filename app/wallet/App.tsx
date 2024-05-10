@@ -11,11 +11,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import IssueScreen from '@/screens/issue';
-import HomeScreen from '@/screens/home';
 import { RootStackParamList } from '@/navigation/types';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import HomeScreen from '@/screens/home';
 import VerifyScreen from '@/screens/verify';
+import IssueScreen from '@/screens/issue';
 
 const config = {
   screens: {

@@ -25,6 +25,12 @@ const Verifier1Page: FC = () => {
     setWindowWidth(window.innerWidth);
   }, []);
 
+  useEffect(() => {
+    setInterval(() => {
+      // check if the user is verified (polling)
+    }, 1000);
+  }, []);
+
   return (
     <Box
       sx={{
