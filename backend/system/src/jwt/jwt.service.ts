@@ -40,13 +40,12 @@ export class JwtService {
     return this.holder;
   }
 
-  async createSignerVerifier(
-    privateKey: crypto.webcrypto.JsonWebKey,
-    publicKey: crypto.webcrypto.JsonWebKey,
-  ) {
-    const signer = await ES256.getSigner(privateKey);
-    const verifier = await ES256.getVerifier(publicKey);
-    return { signer, verifier };
+  async createSigner(privateKey: crypto.webcrypto.JsonWebKey) {
+    return await ES256.getSigner(privateKey);
+  }
+
+  async createVerifier(publicKey: crypto.webcrypto.JsonWebKey) {
+    return await ES256.getVerifier(publicKey);
   }
 
   async create_vc_jwt(
@@ -56,23 +55,11 @@ export class JwtService {
   ): Promise<string> {
     const issuer = this.getIssuer();
     console.log(issuer);
-    const { signer, verifier } = await this.createSignerVerifier(
-      issuer.privateKey,
-      issuer.publicKey,
-    );
-    // console.log('issuer.privateKey');
-    // console.log(issuer.privateKey);
-    // console.log('issuer.publicKey');
-    // console.log(issuer.publicKey);
-    // console.log('signer');
-    // console.log(signer);
-    // console.log('verifier');
-    // console.log(verifier);
+    const issuer_signer = await this.createSigner(issuer.privateKey);
 
-    const issuer_sdjwt = new SDJwtVcInstance({
-      signer,
-      verifier,
-      signAlg: 'EdDSA',
+    const issuer_instance = new SDJwtVcInstance({
+      signer: issuer_signer,
+      signAlg: 'EdDSA', //ES256?
       hasher: digest,
       hashAlg: 'SHA-256',
       saltGenerator: generateSalt,
@@ -86,7 +73,7 @@ export class JwtService {
 
     // Issue a signed JWT credential with the specified claims and disclosures
     // Return a Encoded SD JWT. Issuer send the credential to the holder
-    const credential = await issuer_sdjwt.issue(
+    const credential = await issuer_instance.issue(
       {
         iss: '경력 증명서를 발급해주는 회사',
         iat: new Date().getTime(),
@@ -99,22 +86,18 @@ export class JwtService {
       disclosureFrame,
     );
 
-    // const holder = this.getHolder();
-    // const { signer, verifier } = await this.createSignerVerifier(
-    //   holder.privateKey,
-    //   holder.publicKey,
-    // );
-
-    // const holder_sdjwt = new SDJwtVcInstance({
-    //   signer: signer,
-    //   verifier: verifier,
-    //   signAlg: 'EdDSA',
-    //   hasher: digest,
-    //   hashAlg: 'SHA-256',
-    //   saltGenerator: generateSalt,
-    // });
-
     // 아래는 VP 까지 만드는
+
+    const holder = this.getHolder();
+    const holder_signer = await this.createSigner(holder.privateKey);
+
+    const presenter_instance = new SDJwtVcInstance({
+      kbSigner: holder_signer,
+      kbSignAlg: 'EdDSA',
+      hasher: digest,
+      hashAlg: 'SHA-256',
+      saltGenerator: generateSalt,
+    });
     const kbPayload = {
       //key binding payload
       //VP 에 추가되는 Payload
@@ -124,7 +107,7 @@ export class JwtService {
     };
 
     //SDJWTException: Key Binding Signer not found
-    const vp = await issuer_sdjwt.present(
+    const vp = await presenter_instance.present(
       credential,
       {
         department: true,
@@ -137,7 +120,22 @@ export class JwtService {
     console.log('\nvp\n');
     console.log(vp);
 
-    // console.log(await sdjwt.verify(vp, ['department'], true));
+    // verify 까지 한다면
+    const issuer_verifier = await this.createVerifier(issuer.publicKey);
+    const holder_verifier = await this.createVerifier(holder.publicKey);
+
+    const verifier_instance = new SDJwtVcInstance({
+      verifier: issuer_verifier,
+      signAlg: 'EdDSA',
+      kbVerifier: holder_verifier,
+      kbSignAlg: 'EdDSA',
+      hasher: digest,
+      hashAlg: 'SHA-256',
+      saltGenerator: generateSalt,
+    });
+
+    console.log('\nverify\n');
+    console.log(await verifier_instance.verify(vp, ['department'], true));
 
     return credential;
   }

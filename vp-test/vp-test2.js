@@ -82,6 +82,9 @@ async function vptest() {
   console.log(presentation);
 
   console.log(await sdjwtVerify.verify(presentation, ["department"], true));
+  //department 검증하고 싶은 애가 있는지 없는지 판단
+  //이 verify 로 holder 키로 서명한 시그니처, issuer 키로 서명한 시그니처 모두 검증 가능
+
   // console.log(1<2);
 }
 
