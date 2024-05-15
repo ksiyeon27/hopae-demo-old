@@ -1,20 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ES256, digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import { Claims } from 'src/issuer/dto/claims.dto';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { DisclosureFrame } from '@sd-jwt/types';
 import * as crypto from 'crypto';
 import { Player } from 'src/entities/player.entity';
+import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 
 @Injectable()
 export class JwtService {
+  constructor(readonly didResolverService: DidResolverService) {}
+
   private issuer;
   private holder;
 
-  async createPlayer(player_id: string, type: string): Promise<Player> {
+  async createPlayer(playerId: string, type: string): Promise<Player> {
     const { privateKey, publicKey } = await ES256.generateKeyPair();
     const player = new Player({
-      id: player_id,
+      id: playerId,
       type: type,
       publicKey: publicKey,
       privateKey: privateKey,
@@ -31,12 +34,12 @@ export class JwtService {
   }
 
   getIssuer(): Player {
-    console.log(this.issuer);
+    // console.log(this.issuer);
     return this.issuer;
   }
 
   getHolder(): Player {
-    console.log(this.holder);
+    // console.log(this.holder);
     return this.holder;
   }
 
@@ -48,17 +51,18 @@ export class JwtService {
     return await ES256.getVerifier(publicKey);
   }
 
-  async create_vc_jwt(
+  async createVcJwt(
     claims: Claims,
-    vc_id: string,
-    holder_did: string,
+    vcId: string,
+    holderDid: string,
   ): Promise<string> {
+    console.log('==jwtService: createVcJwt==');
     const issuer = this.getIssuer();
-    console.log(issuer);
-    const issuer_signer = await this.createSigner(issuer.privateKey);
+    // console.log(issuer);
+    const issuerSigner = await this.createSigner(issuer.privateKey);
 
-    const issuer_instance = new SDJwtVcInstance({
-      signer: issuer_signer,
+    const issuerInstance = new SDJwtVcInstance({
+      signer: issuerSigner,
       signAlg: 'EdDSA', //ES256?
       hasher: digest,
       hashAlg: 'SHA-256',
@@ -73,14 +77,14 @@ export class JwtService {
 
     // Issue a signed JWT credential with the specified claims and disclosures
     // Return a Encoded SD JWT. Issuer send the credential to the holder
-    const credential = await issuer_instance.issue(
+    const credential = await issuerInstance.issue(
       {
-        iss: '경력 증명서를 발급해주는 회사',
+        iss: '경력 증명서를 발급해주는 회사', //회사 이름
         iat: new Date().getTime(),
-        vct: 'https://example.com', // 이 3개는 필수
-        id: vc_id, // 이 아래 3개는 합의한대로
+        vct: '경력 증명서', //페이로드 스키마의 식별자
+        id: vcId, // 이 아래 3개는 합의한대로
         issuer: issuer.id,
-        subject: holder_did,
+        subject: holderDid,
         ...claims,
       },
       disclosureFrame,
@@ -89,10 +93,10 @@ export class JwtService {
     // 아래는 VP 까지 만드는
 
     const holder = this.getHolder();
-    const holder_signer = await this.createSigner(holder.privateKey);
+    const holderSigner = await this.createSigner(holder.privateKey);
 
-    const presenter_instance = new SDJwtVcInstance({
-      kbSigner: holder_signer,
+    const presenterInstance = new SDJwtVcInstance({
+      kbSigner: holderSigner,
       kbSignAlg: 'EdDSA',
       hasher: digest,
       hashAlg: 'SHA-256',
@@ -101,17 +105,19 @@ export class JwtService {
     const kbPayload = {
       //key binding payload
       //VP 에 추가되는 Payload
-      iat: Math.floor(Date.now() / 1000), //VP 만든 시각
-      aud: 'https://example.com', //이 VP를 만든 사람의 DID
-      nonce: 'DiF0tB2VN-F73cnE3homjL2', // Verifier에게서 받은 일회용 난수를 암호화한 것- 그냥 아무렇게나 한거..
+      iat: new Date().getTime(), //VP 만든 시각
+      aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
+      nonce: 'aaamock', // 암호화한 난수
     };
 
     //SDJWTException: Key Binding Signer not found
-    const vp = await presenter_instance.present(
+    const vp = await presenterInstance.present(
       credential,
       {
         department: true,
+        position: true,
         join: true,
+        leave: false,
       },
       {
         kb: { payload: kbPayload },
@@ -120,23 +126,112 @@ export class JwtService {
     console.log('\nvp\n');
     console.log(vp);
 
-    // verify 까지 한다면
-    const issuer_verifier = await this.createVerifier(issuer.publicKey);
-    const holder_verifier = await this.createVerifier(holder.publicKey);
+    //verify 까지
+    const issuerVerifier = await this.createVerifier(issuer.publicKey);
+    const holderVerifier = await this.createVerifier(holder.publicKey);
 
-    const verifier_instance = new SDJwtVcInstance({
-      verifier: issuer_verifier,
+    const verifierInstance = new SDJwtVcInstance({
+      verifier: issuerVerifier,
       signAlg: 'EdDSA',
-      kbVerifier: holder_verifier,
+      kbVerifier: holderVerifier,
       kbSignAlg: 'EdDSA',
       hasher: digest,
       hashAlg: 'SHA-256',
       saltGenerator: generateSalt,
     });
 
-    console.log('\nverify\n');
-    console.log(await verifier_instance.verify(vp, ['department'], true));
+    // console.log('\nverify\n');
+    const verified = await verifierInstance.verify(vp, ['department'], true);
+    // console.log(verified);
 
     return credential;
+  }
+
+  async verifyVpJwt(holderDid: string, vp: string) {
+    console.log('==jwtService: verifyVpJwt==');
+    //1. did 리졸버로 holder public key 얻어오기
+    const holderDidDoc = await this.didResolverService.getDidDoc(holderDid);
+    let holderPublicKey = holderDidDoc.publicKey ?? 'mock';
+    console.log(` 1) holderPublicKey : ${holderPublicKey}`);
+
+    //2. decode 해서 payload 에서 필요한 데이터들 얻어오기
+    const vpToken = await this._decodeVpJwt(vp);
+    // console.log(vpToken);
+    // const vct = vpToken.jwt.payload.vct; // 이게 scheme('경력증명서')
+    // console.log(vct); // iss(회사이름), iat(시간)) 도 필수였음
+    const issuerDid = vpToken.jwt.payload.issuer.toString(); // issuerDid
+    console.log(issuerDid);
+    const originalNonce = 'originalNonce';
+    const encryptedNonce = vpToken.kbJwt.payload.nonce;
+    console.log(encryptedNonce);
+    console.log(` 2) decode : ${issuerDid} ${encryptedNonce}`);
+
+    //3. did리졸버로 issuer public key 얻어오기
+    const issuerDidDoc = await this.didResolverService.getDidDoc(issuerDid);
+    let issuerPublicKey = issuerDidDoc.publicKey ?? 'mock';
+    console.log(` 3) issuerPublicKey : ${issuerPublicKey}`);
+
+    //4. 난수 복호화 테스트
+    // const verifyResult = this._verifyNonceUsingPublicKey(
+    //   holderPublicKey,
+    //   originalNonce,
+    //   encryptedNonce,
+    // );
+    // if (!verifyResult) {
+    //   throw new HttpException('pulic key를 통한 verify에 실패함', 400);
+    // }
+    // console.log(` 4) 난수 복호화 테스트 : ${verifyResult}`);
+
+    //5. instance.verify() 하기
+    // 테스트용
+    issuerPublicKey = this.getIssuer().publicKey;
+    holderPublicKey = this.getHolder().publicKey;
+    const issuerVerifier = await this.createVerifier(issuerPublicKey);
+    const holderVerifier = await this.createVerifier(holderPublicKey);
+
+    const verifierInstance = new SDJwtVcInstance({
+      verifier: issuerVerifier,
+      signAlg: 'EdDSA',
+      kbVerifier: holderVerifier,
+      kbSignAlg: 'EdDSA',
+      hasher: digest,
+      hashAlg: 'SHA-256',
+      saltGenerator: generateSalt,
+    });
+
+    // console.log('\nverify\n');
+    const verified = await verifierInstance.verify(vp, ['department'], true);
+    console.log(
+      ` 5) SDJwtVcInstance.verify() : ${issuerPublicKey}, ${holderPublicKey} 이용`,
+    );
+    return verified;
+  }
+
+  async _decodeVpJwt(vp: string) {
+    console.log('==jwtService: _decodeVpJwt==');
+    const decoderInstance = new SDJwtVcInstance({
+      hasher: digest,
+      hashAlg: 'SHA-256',
+      saltGenerator: generateSalt,
+    });
+
+    const sdJwtToken = await decoderInstance.decode(vp);
+    return sdJwtToken;
+  }
+
+  // 이거 일단 임시로 추상화한다고 생각하고 이렇게 만들어놓겠음.
+  // 임시로 만들어놓은 방식은 아래 참조
+  // 바꿔야 함. 암호화와 같은 알고리즘으로 복호화했을 때 같은지 진짜 확인하기. publicKey 타입 바꾸기
+  _verifyNonceUsingPublicKey(
+    publicKey: string,
+    originalNonce: string,
+    encryptedNonce: string,
+  ): boolean {
+    console.log('==jwtService: _verifyNonceUsingPublicKey==');
+    if (originalNonce === encryptedNonce) {
+      return false;
+    }
+    const decrypted = encryptedNonce.replace(publicKey, '');
+    return decrypted === originalNonce;
   }
 }
