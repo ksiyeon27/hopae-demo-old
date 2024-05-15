@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 
 export class PlayersDidData {
   @IsString()
-  readonly holder_did: string;
+  readonly holderDid: string;
   @IsString()
-  readonly issuer_did: string;
+  readonly issuerDid: string;
 }

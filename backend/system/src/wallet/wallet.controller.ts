@@ -7,9 +7,9 @@ export class WalletController {
   constructor(readonly walletService: WalletService) {}
 
   @Post('/vp/career')
-  async verify_career_vp(
-    @Body() career_vp_verify_data: VerifyCareerVpDTO,
+  async verifyCareerVp(
+    @Body() careerVpVerifyData: VerifyCareerVpDTO,
   ): Promise<boolean> {
-    return await this.walletService.verify_career_vp(career_vp_verify_data);
+    return await this.walletService.verifyCareerVp(careerVpVerifyData);
   }
 }

@@ -1,11 +1,10 @@
 import { IsString } from 'class-validator';
 
-export class RequestCareerVcDTO{
-    @IsString()
-    readonly holder_did: string;
-
-    @IsString()
-    readonly orignal_nonce: string;
-    @IsString()
-    readonly encrypted_nonce: string;
+export class RequestCareerVcDTO {
+  @IsString()
+  readonly holderDid: string;
+  @IsString()
+  readonly orignalNonce: string;
+  @IsString()
+  readonly encryptedNonce: string;
 }

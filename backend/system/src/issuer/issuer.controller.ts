@@ -7,21 +7,20 @@ export class IssuerController {
   constructor(readonly issuerService: IssuerService) {}
 
   @Post('players')
-  async makePlayers(@Body() players_did_data: PlayersDidData) {
-    await this.issuerService.makePlayers(players_did_data);
+  async makePlayers(@Body() playersDidData: PlayersDidData) {
+    await this.issuerService.makePlayers(playersDidData);
   }
 
   @Get('/vc/career/:id')
-  async validate_career_vc(@Param('id') vc_id: string): Promise<boolean> {
-    await this.issuerService.start();
-    return this.issuerService.validate_career_vc(vc_id);
+  async findCareerVc(@Param('id') vcId: string): Promise<boolean> {
+    return this.issuerService.findCareerVc(vcId);
   }
 
   @Post('/vc/career')
-  async request_career_vc(
-    @Body() career_vc_request_data: RequestCareerVcDTO,
+  async requestCareerVc(
+    @Body() careerVcRequestData: RequestCareerVcDTO,
   ): Promise<string> {
     await this.issuerService.start();
-    return await this.issuerService.request_career_vc(career_vc_request_data);
+    return await this.issuerService.requestCareerVc(careerVcRequestData);
   }
 }
