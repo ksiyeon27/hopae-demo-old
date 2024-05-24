@@ -9,7 +9,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { extractData, makeVP } from '@/utils/jwt';
 
@@ -64,11 +63,15 @@ const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
         return;
       }
       const credentials: string[] = JSON.parse(creds);
-      const result = credentials.filter((a) => {
-        const data = extractData(a);
+      const promises = credentials.map(async (a) => {
+        return await extractData(a);
+      });
+
+      const results = await Promise.all(promises);
+      const filteredResults = results.filter((data) => {
         return data?.fields.every((val) => fields.includes(val));
       });
-      if (result.length === 0) {
+      if (filteredResults.length === 0) {
         Alert.alert(
           '요구한 정보를 제공할 인증서가 없습니다',
           '',
@@ -89,7 +92,7 @@ const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
         );
         return;
       }
-      const vp = makeVP(result[0], fields, randomString);
+      const vp = makeVP(filteredResults[0]!.rawString, fields, randomString);
       // axios.post(route.params.url, vp).then((res) => {});
       Alert.alert(
         '인증이 완료되었습니다',
