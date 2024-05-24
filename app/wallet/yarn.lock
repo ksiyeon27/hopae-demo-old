@@ -1220,6 +1220,13 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
+"@hopae/sd-jwt@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@hopae/sd-jwt/-/sd-jwt-2.0.1.tgz#3a2fa3ce0c32d9e5ce9056545635716105049c4e"
+  integrity sha512-CTTsf7nNO5WyPqEE0EqUfbrzyylHx3a3r/R+TYe8B4+tj5ZlqvhAi4g+ia3Q6GBUzrQ35F/nAUGQgyYpiH+ZTA==
+  dependencies:
+    jose "^5.1.3"
+
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.14.tgz"
@@ -1941,6 +1948,51 @@
     lighthouse-logger "^1.0.0"
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
+
+"@sd-jwt/core@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/core/-/core-0.7.0.tgz#ebacddd4015db24c8901a06bb3b771eddea28d1d"
+  integrity sha512-S6syiR6KUfQMWB1YlBudB9iNIji0p+Ip2XSPdqBkSCBJq7o5RBGhoZppHjuOFe+5KImQYv1ltEyJtNZqiRU/rQ==
+  dependencies:
+    "@sd-jwt/decode" "0.7.0"
+    "@sd-jwt/present" "0.7.0"
+    "@sd-jwt/types" "0.7.0"
+    "@sd-jwt/utils" "0.7.0"
+
+"@sd-jwt/crypto-nodejs@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/crypto-nodejs/-/crypto-nodejs-0.7.0.tgz#ece2da256184c9f89b820a632f031931bb04c544"
+  integrity sha512-JXR4y8Yy8VY9k+fkv7PMUpSlo4c3e1hBBlj5StGXo7+7et5d0fBoQmnpOpy9fZfaLVS2suuEhK//OTYhUN3Nnw==
+
+"@sd-jwt/decode@0.7.0", "@sd-jwt/decode@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/decode/-/decode-0.7.0.tgz#b899edba3582b4b6db2e90cf010c6aebad9a360c"
+  integrity sha512-XPLwelf8pOVWsJ9D+Y0BW6nvKN7Q/+cTcSRBlFcGYh/vJ4MGpT4Q1c4V6RrawpI9UUE485OqG/xhftCJ+x6P2Q==
+  dependencies:
+    "@sd-jwt/types" "0.7.0"
+    "@sd-jwt/utils" "0.7.0"
+
+"@sd-jwt/present@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/present/-/present-0.7.0.tgz#a9c7494a1962a48e94953e78bd1cd28d1f7ef351"
+  integrity sha512-ozWRrobhmfSmAC2v0D6oS+abPPcmAjxGPZsaJL/064n1CN9rkbsRmyZvZ8U7rADJYF6INqE295Zpz1p6MaYK+w==
+  dependencies:
+    "@sd-jwt/decode" "0.7.0"
+    "@sd-jwt/types" "0.7.0"
+    "@sd-jwt/utils" "0.7.0"
+
+"@sd-jwt/types@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/types/-/types-0.7.0.tgz#28fb3a9772467e771dc214112ef66362162c4528"
+  integrity sha512-jSHokgiv2rR/6bORK1Ym7WZb4k9mImVneE/Lt0rqKTA7xSX5IwIOCpjEAG7dIRWUqIdC1pFPRI/XkGri2BUiPQ==
+
+"@sd-jwt/utils@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/utils/-/utils-0.7.0.tgz#382abc116b70c5ab83726de5871eda304499621f"
+  integrity sha512-/paioVASVMuNA2YOf/Bn9eGCot5QXBsMSYJNf7kcC+9UHsTgI2emVP2oYlBQRJHVduohy0BuaqpsOHDpZwoE0A==
+  dependencies:
+    "@sd-jwt/types" "0.7.0"
+    js-base64 "^3.7.6"
 
 "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -4746,6 +4798,16 @@ joi@^17.2.1:
     "@sideway/address" "^4.1.5"
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
+
+jose@^5.1.3:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.3.0.tgz#61dadf6399e0141d621ad18c1b36a0d6ab17a972"
+  integrity sha512-IChe9AtAE79ru084ow8jzkN2lNrG3Ntfiv65Cvj9uOCE2m5LNsdHG+9EbxWxAoWRF9TgDOqLN5jm08++owDVRg==
+
+js-base64@^3.7.6:
+  version "3.7.7"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.7.tgz#e51b84bf78fbf5702b9541e2cb7bfcb893b43e79"
+  integrity sha512-7rCnleh0z2CkXhH67J8K1Ytz0b2Y+yxTPL+/KOJoa20hfnVQ/3/T6W/KflYI4bRHRagNeXeU2bkNGI3v1oS/lw==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

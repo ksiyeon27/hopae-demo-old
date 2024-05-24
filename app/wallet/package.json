@@ -10,9 +10,13 @@
     "test": "jest"
   },
   "dependencies": {
+    "@hopae/sd-jwt": "^2.0.1",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
+    "@sd-jwt/core": "^0.7.0",
+    "@sd-jwt/crypto-nodejs": "^0.7.0",
+    "@sd-jwt/decode": "^0.7.0",
     "axios": "^1.6.8",
     "babel-plugin-module-resolver": "^5.0.2",
     "react": "18.2.0",
