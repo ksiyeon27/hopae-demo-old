@@ -12,7 +12,6 @@ import {
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { extractData, makeVP } from '@/utils/jwt';
-import { CredentialInfo } from '@/entities/credentialInfo';
 
 type VerifyScreenProps = NativeStackScreenProps<RootStackParamList, 'Verify'>;
 const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
