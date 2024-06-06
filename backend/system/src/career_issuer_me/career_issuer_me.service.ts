@@ -13,7 +13,7 @@ export class CareerIssuerMeService {
     private readonly careerIssuerMeRepository: Repository<CareerIssuerMeEntity>,
   ) {}
 
-  async createCareerIssuerMe(
+  async create(
     did: string,
     publicKey: string,
     privateKey: string,
@@ -35,10 +35,6 @@ export class CareerIssuerMeService {
       throw new Error('Entity not found');
     }
     const entity = entities[0];
-
-    console.log(`entity: ${entity}`);
-
-    console.log(`json_parse_publickey: ${JSON.parse(entity.publicKey)}`);
 
     return new CareerIssuerMe({
       did: entity.did,

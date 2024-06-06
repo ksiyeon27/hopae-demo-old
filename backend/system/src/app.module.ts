@@ -12,6 +12,8 @@ import { CareerIssuerMeEntity } from './entities/career_issuer_me.entity';
 import { CareerIssuerMeModule } from './career_issuer_me/career_issuer_me.module';
 import { CareerIssuerEmployeeModule } from './career_issuer_employee/career_issuer_employee.module';
 import { CareerIssuerEmployeeEntity } from './entities/career_issuer_employee.entity';
+import { CareerIssuerEmployeeNonceModule } from './career_issuer_employee_nonce/career_issuer_employee_nonce.module';
+import { CareerIssuerEmployeeNonceEntity } from './entities/career_issuer_employee_nonce.entity';
 
 @Module({
   imports: [
@@ -37,7 +39,11 @@ import { CareerIssuerEmployeeEntity } from './entities/career_issuer_employee.en
       database: process.env.DB_NAME,
       synchronize: true, //엔티티와 데이터베이스 테이블을 자동으로 동기화할지 여부를 지정합니다. 이 경우 true로 설정하여 자동 동기화를 활성화합니다. 개발모드에서만 사용해야
       logging: false,
-      entities: [CareerIssuerMeEntity, CareerIssuerEmployeeEntity],
+      entities: [
+        CareerIssuerMeEntity,
+        CareerIssuerEmployeeEntity,
+        CareerIssuerEmployeeNonceEntity,
+      ],
     }),
     IssuerModule,
     WalletModule,
@@ -45,6 +51,7 @@ import { CareerIssuerEmployeeEntity } from './entities/career_issuer_employee.en
     DidResolverModule,
     CareerIssuerMeModule,
     CareerIssuerEmployeeModule,
+    CareerIssuerEmployeeNonceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

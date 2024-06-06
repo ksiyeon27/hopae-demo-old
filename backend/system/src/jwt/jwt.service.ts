@@ -34,7 +34,7 @@ export class JwtService {
       const publicKeyString = JSON.stringify(publicKey);
       const privateKeyString = JSON.stringify(privateKey);
 
-      this.careerIssuerMeService.createCareerIssuerMe(
+      this.careerIssuerMeService.create(
         playerId,
         publicKeyString,
         privateKeyString,

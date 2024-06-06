@@ -7,6 +7,7 @@ import { PlayersDidData } from 'src/dto/players-did-data.dto';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerIssuerEmployeeService } from 'src/career_issuer_employee/career_issuer_employee.service';
 import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity';
+import { CareerIssuerEmployeeNonceService } from 'src/career_issuer_employee_nonce/career_issuer_employee_nonce.service';
 
 @Injectable()
 export class IssuerService {
@@ -14,6 +15,7 @@ export class IssuerService {
     readonly jwtService: JwtService,
     readonly didResolverService: DidResolverService,
     readonly careerIssuerEmployeeService: CareerIssuerEmployeeService,
+    readonly careerIssuerEmployeeNonceService: CareerIssuerEmployeeNonceService,
   ) {}
 
   private certificates: string[] = []; //DB table
@@ -39,6 +41,15 @@ export class IssuerService {
     } else {
       return true;
     }
+  }
+
+  requestNonceForCareer(holderDid: string): number {
+    // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
+    const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
+
+    // career_issuer_employee_nonce 테이블에 저장하기
+    this.careerIssuerEmployeeNonceService.create(holderDid, nonce);
+    return nonce;
   }
 
   async requestCareerVc(
