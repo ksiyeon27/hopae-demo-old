@@ -4,32 +4,34 @@ import { Claims } from 'src/issuer/dto/claims.dto';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { DisclosureFrame } from '@sd-jwt/types';
 import * as crypto from 'crypto';
-import { Player } from 'src/entities/player.entity';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerIssuerMeService } from 'src/career_issuer_me/career_issuer_me.service';
 import { CareerIssuerMe } from 'src/entities/career_issuer_me.entity';
+import { TestHolderService } from 'src/test_holder/test_holder.service';
+import { TestHolder } from 'src/entities/test_holder.entity';
 
 @Injectable()
 export class JwtService {
   constructor(
     readonly didResolverService: DidResolverService,
     readonly careerIssuerMeService: CareerIssuerMeService,
+    readonly testHolderService: TestHolderService,
   ) {}
 
-  private holder;
-
-  async createPlayer(playerId: string, type: string): Promise<Player> {
+  async createPlayer(playerId: string, type: string) {
     const { privateKey, publicKey } = await ES256.generateKeyPair();
-    const player = new Player({
-      id: playerId,
-      type: type,
-      publicKey: publicKey,
-      privateKey: privateKey,
-    });
-    if (player.type === 'holder') {
-      this.holder = player;
-      // console.log(this.holder);
-    } else if (player.type === 'issuer') {
+
+    if (type === 'holder') {
+      // test_holder entity 생성
+      const publicKeyString = JSON.stringify(publicKey);
+      const privateKeyString = JSON.stringify(privateKey);
+
+      this.testHolderService.create(
+        playerId,
+        publicKeyString,
+        privateKeyString,
+      );
+    } else if (type === 'issuer') {
       // career_issuer_me entity 생성
       const publicKeyString = JSON.stringify(publicKey);
       const privateKeyString = JSON.stringify(privateKey);
@@ -40,21 +42,15 @@ export class JwtService {
         privateKeyString,
         'career_issuer',
       );
-
-      // console.log(this.issuer);
     }
-
-    return player;
   }
 
   async getIssuer(): Promise<CareerIssuerMe> {
-    // console.log(this.issuer);
     return await this.careerIssuerMeService.findMe();
   }
 
-  getHolder(): Player {
-    // console.log(this.holder);
-    return this.holder;
+  async getHolderByDid(did: string): Promise<TestHolder> {
+    return await this.testHolderService.findOneByDid(did);
   }
 
   async createSigner(privateKey: crypto.webcrypto.JsonWebKey) {
@@ -108,7 +104,7 @@ export class JwtService {
 
     // 아래는 VP 까지 만드는
 
-    const holder = this.getHolder();
+    const holder = await this.getHolderByDid(holderDid);
     const holderSigner = await this.createSigner(holder.privateKey);
 
     const presenterInstance = new SDJwtVcInstance({
@@ -123,7 +119,7 @@ export class JwtService {
       //VP 에 추가되는 Payload
       iat: new Date().getTime(), //VP 만든 시각
       aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
-      nonce: 'aaamock', // 암호화한 난수
+      nonce: '1448555562mock', // 암호화한 난수 - /verifier/nonce/career 응답 + Mock
     };
 
     //SDJWTException: Key Binding Signer not found
@@ -200,8 +196,9 @@ export class JwtService {
     //5. instance.verify() 하기
     // 테스트용
     const issuer = await this.getIssuer();
+    const holder = await this.getHolderByDid(holderDid);
     issuerPublicKey = issuer.publicKey;
-    holderPublicKey = this.getHolder().publicKey;
+    holderPublicKey = holder.publicKey;
     const issuerVerifier = await this.createVerifier(issuerPublicKey);
     const holderVerifier = await this.createVerifier(holderPublicKey);
 

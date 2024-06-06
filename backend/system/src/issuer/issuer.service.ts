@@ -26,7 +26,7 @@ export class IssuerService {
     );
     await this.jwtService.createPlayer(playersDidData.holderDid, 'holder');
     await this.jwtService.createPlayer(playersDidData.issuerDid, 'issuer');
-    this.jwtService.getHolder();
+    await this.jwtService.getHolderByDid(playersDidData.holderDid);
     await this.jwtService.getIssuer();
   }
 

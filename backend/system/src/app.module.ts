@@ -16,6 +16,8 @@ import { CareerIssuerEmployeeNonceModule } from './career_issuer_employee_nonce/
 import { CareerIssuerEmployeeNonceEntity } from './entities/career_issuer_employee_nonce.entity';
 import { CareerVerifierApplicantNonceModule } from './career_verifier_applicant_nonce/career_verifier_applicant_nonce.module';
 import { CareerVerifierApplicantNonceEntity } from './entities/career_verifier_applicant_nonce.enity';
+import { TestHolderModule } from './test_holder/test_holder.module';
+import { TestHolderEntity } from './entities/test_holder.entity';
 
 @Module({
   imports: [
@@ -42,6 +44,7 @@ import { CareerVerifierApplicantNonceEntity } from './entities/career_verifier_a
       synchronize: true, //엔티티와 데이터베이스 테이블을 자동으로 동기화할지 여부를 지정합니다. 이 경우 true로 설정하여 자동 동기화를 활성화합니다. 개발모드에서만 사용해야
       logging: false,
       entities: [
+        TestHolderEntity,
         CareerIssuerMeEntity,
         CareerIssuerEmployeeEntity,
         CareerIssuerEmployeeNonceEntity,
@@ -56,6 +59,7 @@ import { CareerVerifierApplicantNonceEntity } from './entities/career_verifier_a
     CareerIssuerEmployeeModule,
     CareerIssuerEmployeeNonceModule,
     CareerVerifierApplicantNonceModule,
+    TestHolderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
