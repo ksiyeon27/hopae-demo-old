@@ -8,7 +8,8 @@ import { DidResolverModule } from './did_resolver/did_resolver.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { PlayerEntity } from './entities/player.entity';
+import { CareerIssuerMeEntity } from './entities/career_issuer_me.entity';
+import { CareerIssuerMeModule } from './career_issuer_me/career_issuer_me.module';
 
 @Module({
   imports: [
@@ -33,13 +34,14 @@ import { PlayerEntity } from './entities/player.entity';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       synchronize: true, //엔티티와 데이터베이스 테이블을 자동으로 동기화할지 여부를 지정합니다. 이 경우 true로 설정하여 자동 동기화를 활성화합니다. 개발모드에서만 사용해야
-      logging: true,
-      entities: [PlayerEntity],
+      logging: false,
+      entities: [CareerIssuerMeEntity],
     }),
     IssuerModule,
     WalletModule,
     JwtModule,
     DidResolverModule,
+    CareerIssuerMeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

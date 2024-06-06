@@ -23,7 +23,7 @@ export class IssuerService {
     await this.jwtService.createPlayer(playersDidData.holderDid, 'holder');
     await this.jwtService.createPlayer(playersDidData.issuerDid, 'issuer');
     this.jwtService.getHolder();
-    this.jwtService.getIssuer();
+    await this.jwtService.getIssuer();
   }
 
   async start() {
@@ -68,8 +68,7 @@ export class IssuerService {
     careerVcRequestData: RequestCareerVcDTO,
   ): Promise<string> {
     console.log('==issuerService: requestCareerVc==');
-    // console.log('issuer');
-    this.jwtService.getIssuer();
+
     // 1. 홀더 검증 : DID resolver API 호출해서 did docs 얻어오고, 난수 복호화 시도
     const didDoc = await this.didResolverService.getDidDoc(
       careerVcRequestData.holderDid,

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ES256, digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import { Claims } from 'src/issuer/dto/claims.dto';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
@@ -6,12 +6,16 @@ import type { DisclosureFrame } from '@sd-jwt/types';
 import * as crypto from 'crypto';
 import { Player } from 'src/entities/player.entity';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
+import { CareerIssuerMeService } from 'src/career_issuer_me/career_issuer_me.service';
+import { CareerIssuerMe } from 'src/entities/career_issuer_me.entity';
 
 @Injectable()
 export class JwtService {
-  constructor(readonly didResolverService: DidResolverService) {}
+  constructor(
+    readonly didResolverService: DidResolverService,
+    readonly careerIssuerMeService: CareerIssuerMeService,
+  ) {}
 
-  private issuer;
   private holder;
 
   async createPlayer(playerId: string, type: string): Promise<Player> {
@@ -26,16 +30,26 @@ export class JwtService {
       this.holder = player;
       // console.log(this.holder);
     } else if (player.type === 'issuer') {
-      this.issuer = player;
+      // career_issuer_me entity 생성
+      const publicKeyString = JSON.stringify(publicKey);
+      const privateKeyString = JSON.stringify(privateKey);
+
+      this.careerIssuerMeService.createCareerIssuerMe(
+        playerId,
+        publicKeyString,
+        privateKeyString,
+        'career_issuer',
+      );
+
       // console.log(this.issuer);
     }
 
     return player;
   }
 
-  getIssuer(): Player {
+  async getIssuer(): Promise<CareerIssuerMe> {
     // console.log(this.issuer);
-    return this.issuer;
+    return await this.careerIssuerMeService.findMe();
   }
 
   getHolder(): Player {
@@ -57,9 +71,11 @@ export class JwtService {
     holderDid: string,
   ): Promise<string> {
     console.log('==jwtService: createVcJwt==');
-    const issuer = this.getIssuer();
+    const issuer = await this.getIssuer();
+
     // console.log(issuer);
     const issuerSigner = await this.createSigner(issuer.privateKey);
+    console.log(issuerSigner);
 
     const issuerInstance = new SDJwtVcInstance({
       signer: issuerSigner,
@@ -83,7 +99,7 @@ export class JwtService {
         iat: new Date().getTime(),
         vct: '경력 증명서', //페이로드 스키마의 식별자
         id: vcId, // 이 아래 3개는 합의한대로
-        issuer: issuer.id,
+        issuer: issuer.did,
         subject: holderDid,
         ...claims,
       },
@@ -184,7 +200,8 @@ export class JwtService {
 
     //5. instance.verify() 하기
     // 테스트용
-    issuerPublicKey = this.getIssuer().publicKey;
+    const issuer = await this.getIssuer();
+    issuerPublicKey = issuer.publicKey;
     holderPublicKey = this.getHolder().publicKey;
     const issuerVerifier = await this.createVerifier(issuerPublicKey);
     const holderVerifier = await this.createVerifier(holderPublicKey);
