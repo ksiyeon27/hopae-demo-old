@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ES256, digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import { Claims } from 'src/issuer/dto/claims.dto';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
@@ -9,6 +9,7 @@ import { CareerIssuerMeService } from 'src/career_issuer_me/career_issuer_me.ser
 import { CareerIssuerMe } from 'src/entities/career_issuer_me.entity';
 import { TestHolderService } from 'src/test_holder/test_holder.service';
 import { TestHolder } from 'src/entities/test_holder.entity';
+import { CareerVerifierApplicantNonceService } from 'src/career_verifier_applicant_nonce/career_verifier_applicant_nonce.service';
 
 @Injectable()
 export class JwtService {
@@ -16,6 +17,7 @@ export class JwtService {
     readonly didResolverService: DidResolverService,
     readonly careerIssuerMeService: CareerIssuerMeService,
     readonly testHolderService: TestHolderService,
+    readonly careerVerifierApplicantNonceService: CareerVerifierApplicantNonceService,
   ) {}
 
   async createPlayer(playerId: string, type: string) {
@@ -119,7 +121,7 @@ export class JwtService {
       //VP 에 추가되는 Payload
       iat: new Date().getTime(), //VP 만든 시각
       aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
-      nonce: '1448555562mock', // 암호화한 난수 - /verifier/nonce/career 응답 + Mock
+      nonce: '448982760mock', // 암호화한 난수 - /verifier/nonce/career 응답 + Mock
     };
 
     //SDJWTException: Key Binding Signer not found
@@ -164,7 +166,7 @@ export class JwtService {
     //1. did 리졸버로 holder public key 얻어오기
     const holderDidDoc = await this.didResolverService.getDidDoc(holderDid);
     let holderPublicKey = holderDidDoc.publicKey ?? 'mock';
-    console.log(` 1) holderPublicKey : ${holderPublicKey}`);
+    console.log(` 1) did 리졸버로 holderPublicKey 얻기 : ${holderPublicKey}`);
 
     //2. decode 해서 payload 에서 필요한 데이터들 얻어오기
     const vpToken = await this._decodeVpJwt(vp);
@@ -175,23 +177,34 @@ export class JwtService {
     console.log(issuerDid);
     const encryptedNonce = vpToken.kbJwt.payload.nonce;
     console.log(encryptedNonce);
-    console.log(` 2) decode : ${issuerDid} ${encryptedNonce}`);
+    console.log(
+      ` 2) vp decode 해서 데이터 얻어오기 : ${issuerDid}, ${encryptedNonce}`,
+    );
 
     //3. did리졸버로 issuer public key 얻어오기
     const issuerDidDoc = await this.didResolverService.getDidDoc(issuerDid);
     let issuerPublicKey = issuerDidDoc.publicKey ?? 'mock';
-    console.log(` 3) issuerPublicKey : ${issuerPublicKey}`);
+    console.log(` 3) did 리졸버로 issuerPublicKey 얻기 : ${issuerPublicKey}`);
 
     //4. 난수 복호화 테스트
-    // const verifyResult = this._verifyNonceUsingPublicKey(
-    //   holderPublicKey,
-    //   originalNonce,
-    //   encryptedNonce,
-    // );
-    // if (!verifyResult) {
-    //   throw new HttpException('pulic key를 통한 verify에 실패함', 400);
-    // }
-    // console.log(` 4) 난수 복호화 테스트 : ${verifyResult}`);
+    const didDoc = await this.didResolverService.getDidDoc(holderDid);
+    // 실제로는 public key 담겨있는 공간이 약간 다른데 대충 일단은 여기 있다고 가정하자
+
+    const publicKey = didDoc.publicKey ?? 'mock';
+    const applicant_nonce_entity =
+      await this.careerVerifierApplicantNonceService.findOneByDid(holderDid);
+
+    const verifyResult = this._verifyNonceUsingPublicKey(
+      publicKey,
+      applicant_nonce_entity.nonce,
+      encryptedNonce,
+    );
+    if (!verifyResult) {
+      throw new HttpException('pulic key를 통한 난수 verify에 실패함', 400);
+    }
+    console.log(
+      ` 4) 난수 복호화 테스트 : ${verifyResult} - ${encryptedNonce}, ${applicant_nonce_entity.nonce}`,
+    );
 
     //5. instance.verify() 하기
     // 테스트용

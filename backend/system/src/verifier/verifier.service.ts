@@ -36,7 +36,7 @@ export class VerifierService {
     } catch (SDJWTException) {
       throw new HttpException('sd-jwt verify 실패', 400);
     }
-    console.log('1번 검증 완료 (시그니처, 난수 검증)');
+    console.log('!! 1번 검증 완료 (시그니처, 난수 검증)');
 
     // 2. VC 가 from issuer 가 맞는지 issuer API 호출해서 확인
     const payload: any = verified.payload;
@@ -49,11 +49,11 @@ export class VerifierService {
     if (!find) {
       throw new HttpException('VC 가 issuer 의 DB 에서 조회되지 않음', 400);
     }
-    console.log(`2번 검증 완료 (issuer 디비에서 vcId 찾기 : ${vcId})`);
+    console.log(`!! 2번 검증 완료 (issuer 디비에서 vcId 찾기 : ${vcId})`);
 
     // 3. Did resolver 로 vcId 찾아와서 만료되었는지 확인
     const vcDidDoc = await this.didResolverService.getDidDoc(vcId);
-    console.log(`3번 검증 완료 (vcId 로 Did Resolver 가 찾기 : ${vcId})`);
+    console.log(`!! 3번 검증 완료 (vcId 로 Did Resolver 가 찾기 : ${vcId})`);
     // 만료기간 확인하는 코드 추가 필요
     console.log(vcDidDoc);
 
