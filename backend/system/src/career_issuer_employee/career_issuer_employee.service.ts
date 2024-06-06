@@ -12,7 +12,25 @@ export class CareerIssuerEmployeeService {
     @InjectRepository(CareerIssuerEmployeeEntity)
     private readonly careerIssuerEmployeeRepository: Repository<CareerIssuerEmployeeEntity>,
   ) {}
+  async create(
+    did: string,
+    department: string,
+    position: string,
+    salary: number,
+    join: Date,
+    leave: Date,
+  ): Promise<CareerIssuerEmployeeEntity> {
+    const careerIssuerEmployee = this.careerIssuerEmployeeRepository.create({
+      did,
+      department,
+      position,
+      salary,
+      join,
+      leave,
+    });
 
+    return await this.careerIssuerEmployeeRepository.save(careerIssuerEmployee);
+  }
   async findOneByDid(did: string): Promise<CareerIssuerEmployee> {
     const entity = await this.careerIssuerEmployeeRepository.findOne({
       where: { did },

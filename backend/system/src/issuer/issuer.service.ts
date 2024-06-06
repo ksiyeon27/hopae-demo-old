@@ -3,12 +3,13 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { Claims } from './dto/claims.dto';
 import { JwtService } from 'src/jwt/jwt.service';
-import { PlayersDidData } from 'src/dto/players-did-data.dto';
+import { PlayersDidData } from './dto/players-did-data.dto';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerIssuerEmployeeService } from 'src/career_issuer_employee/career_issuer_employee.service';
 import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity';
 import { CareerIssuerEmployeeNonceService } from 'src/career_issuer_employee_nonce/career_issuer_employee_nonce.service';
 import { CareerIssuerCertificateService } from 'src/career_issuer_certificate/career_issuer_certificate.service';
+import { EmployeeData } from './dto/employee-data.dto';
 
 @Injectable()
 export class IssuerService {
@@ -28,6 +29,18 @@ export class IssuerService {
     await this.jwtService.createPlayer(playersDidData.issuerDid, 'issuer');
     await this.jwtService.getHolderByDid(playersDidData.holderDid);
     await this.jwtService.getIssuer();
+  }
+
+  async makeEmployee(employeeData: EmployeeData) {
+    console.log(`==issuerService: makeEmployee`);
+    await this.careerIssuerEmployeeService.create(
+      employeeData.did,
+      employeeData.department,
+      employeeData.position,
+      employeeData.salary,
+      new Date(employeeData.join),
+      new Date(employeeData.leave),
+    );
   }
 
   async findCareerVc(vcDid: string): Promise<boolean> {
