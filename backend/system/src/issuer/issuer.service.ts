@@ -64,16 +64,19 @@ export class IssuerService {
 
     // 실제로는 public key 담겨있는 공간이 약간 다른데 대충 일단은 여기 있다고 가정하자
     const publicKey = didDoc.publicKey ?? 'mock';
-    const originalNonce = careerVcRequestData.orignalNonce;
+    const employee_nonce_entity =
+      await this.careerIssuerEmployeeNonceService.findOneByDid(
+        careerVcRequestData.holderDid,
+      );
     const encryptedNonce = careerVcRequestData.encryptedNonce;
 
     const verifyResult = this.jwtService._verifyNonceUsingPublicKey(
       publicKey,
-      originalNonce,
+      employee_nonce_entity.nonce,
       encryptedNonce,
     );
     if (!verifyResult) {
-      throw new HttpException('pulic key를 통한 verify에 실패함', 400);
+      throw new HttpException('pulic key를 통한 난수 verify에 실패함', 400);
     }
 
     // issuer DB 에서 career 가져오기

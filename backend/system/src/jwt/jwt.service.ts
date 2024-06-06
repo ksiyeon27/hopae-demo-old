@@ -177,7 +177,6 @@ export class JwtService {
     // console.log(vct); // iss(회사이름), iat(시간)) 도 필수였음
     const issuerDid = vpToken.jwt.payload.issuer.toString(); // issuerDid
     console.log(issuerDid);
-    const originalNonce = 'originalNonce';
     const encryptedNonce = vpToken.kbJwt.payload.nonce;
     console.log(encryptedNonce);
     console.log(` 2) decode : ${issuerDid} ${encryptedNonce}`);
@@ -241,14 +240,18 @@ export class JwtService {
   // 바꿔야 함. 암호화와 같은 알고리즘으로 복호화했을 때 같은지 진짜 확인하기. publicKey 타입 바꾸기
   _verifyNonceUsingPublicKey(
     publicKey: string,
-    originalNonce: string,
+    originalNonce: number,
     encryptedNonce: string,
   ): boolean {
+    const originalNonceStr = '' + originalNonce;
     console.log('==jwtService: _verifyNonceUsingPublicKey==');
-    if (originalNonce === encryptedNonce) {
+    console.log(originalNonceStr);
+    console.log(encryptedNonce);
+
+    if (originalNonceStr === encryptedNonce) {
       return false;
     }
     const decrypted = encryptedNonce.replace(publicKey, '');
-    return decrypted === originalNonce;
+    return decrypted === originalNonceStr;
   }
 }
