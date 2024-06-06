@@ -20,7 +20,6 @@ export class IssuerController {
   async requestCareerVc(
     @Body() careerVcRequestData: RequestCareerVcDTO,
   ): Promise<string> {
-    await this.issuerService.start();
     return await this.issuerService.requestCareerVc(careerVcRequestData);
   }
 }

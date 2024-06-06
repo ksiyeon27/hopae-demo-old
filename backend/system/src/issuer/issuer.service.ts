@@ -1,19 +1,21 @@
 import { RequestCareerVcDTO } from './dto/request-career-vc.dto';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { Career } from './entities/career.entity';
+
 import { Claims } from './dto/claims.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { PlayersDidData } from 'src/dto/players-did-data.dto';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
+import { CareerIssuerEmployeeService } from 'src/career_issuer_employee/career_issuer_employee.service';
+import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity';
 
 @Injectable()
 export class IssuerService {
   constructor(
     readonly jwtService: JwtService,
     readonly didResolverService: DidResolverService,
+    readonly careerIssuerEmployeeService: CareerIssuerEmployeeService,
   ) {}
 
-  private careers: Career[] = []; //DB table
   private certificates: string[] = []; //DB table
 
   async makePlayers(playersDidData: PlayersDidData) {
@@ -24,31 +26,6 @@ export class IssuerService {
     await this.jwtService.createPlayer(playersDidData.issuerDid, 'issuer');
     this.jwtService.getHolder();
     await this.jwtService.getIssuer();
-  }
-
-  async start() {
-    console.log('==issuerService: start (did1, did2)==');
-    this.careers.push({
-      id: 'did1',
-      ...{
-        department: '개발부서',
-        position: '대리',
-        salary: 50000,
-        join: '20221222',
-        leave: '20241222',
-      },
-    });
-
-    this.careers.push({
-      id: 'did2',
-      ...{
-        department: '마케팅부서',
-        position: '팀장',
-        salary: 70000,
-        join: '20181222',
-        leave: '20231222',
-      },
-    });
   }
 
   findCareerVc(vcId: string): boolean {
@@ -89,17 +66,17 @@ export class IssuerService {
     }
 
     // issuer DB 에서 career 가져오기
-    const career = this.careers.find(
-      (career) => career.id === careerVcRequestData.holderDid,
+    const employee = await this.careerIssuerEmployeeService.findOneByDid(
+      careerVcRequestData.holderDid,
     );
-    if (!career) {
+    if (!employee) {
       throw new NotFoundException(
         '해당하는 holder의 커리어 정보를 찾을 수 없습니다.',
       ); //안에 message 가능
     }
 
     // 2. VC 생성
-    const vcClaims = this._createVcClaims(career);
+    const vcClaims = this._createVcClaims(employee);
 
     const newVcDid = 'new_vc_id'; // POST /did/{did}
     const newVc = this.jwtService.createVcJwt(
@@ -114,14 +91,14 @@ export class IssuerService {
     return newVc;
   }
 
-  _createVcClaims(career: Career): Claims {
+  _createVcClaims(employee: CareerIssuerEmployee): Claims {
     //VC 생성 (추후 sd-jwt : issuer 의 pirvate_key 이용)
     // POST /did/{did}?
     const claims = new Claims({
-      department: career.department,
-      position: career.position,
-      join: career.join,
-      leave: career.leave,
+      department: employee.department,
+      position: employee.position,
+      join: employee.join.toLocaleDateString(),
+      leave: employee.leave.toLocaleDateString(),
     });
 
     return claims;
