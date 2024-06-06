@@ -1,10 +1,10 @@
 import { CredentialInfo } from '@/entities/credentialInfo';
 import { SDJwtInstance } from '@sd-jwt/core';
-import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
-import { decodeSdJwt, getClaims } from '@sd-jwt/decode';
-import { digest, ES256, generateSalt } from '@sd-jwt/crypto-browser';
+import { decodeJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
+import { digest, generateSalt, getSigner } from '@/utils/crypto';
 import { HMAC } from 'react-native-simple-crypto';
 import { Buffer } from 'buffer';
+import { Base64 } from 'js-base64';
 
 // Your secret key (private key for HS256)
 const secretKey = 'your-very-secure-private-key';
@@ -43,35 +43,27 @@ export const extractData = async (
   vc: string,
 ): Promise<CredentialInfo | null> => {
   try {
-    console.log('--------------1');
-    const instance = new SDJwtVcInstance({
+    const { 0: header, 1: payload, 2: signature, length } = vc.split('.');
+    const decodedSdJwt = await decodeSdJwt(vc, digest);
+    const claims: any = await getClaims(
+      decodedSdJwt.jwt.payload,
+      decodedSdJwt.disclosures,
+      digest,
+    );
+    const vpInstance = new SDJwtInstance({
       hasher: digest,
       hashAlg: 'SHA-256',
       saltGenerator: generateSalt,
+      kbSigner: await getSigner(holderPrivateKey),
+      kbSignAlg: 'ES256',
     });
-    const decodedSdJwt = await instance.decode(vc);
-    console.log(decodedSdJwt);
-    console.log('--------------2');
-    // const claims: any = await getClaims(
-    //   decodedSdJwt.jwt.payload,
-    //   decodedSdJwt.disclosures,
-    //   digest,
-    // );
-    // const vpInstance = new SDJwtInstance({
-    //   hasher: digest,
-    //   hashAlg: 'SHA-256',
-    //   saltGenerator: generateSalt,
-    //   kbSigner: await ES256.getSigner(holderPrivateKey),
-    //   kbSignAlg: 'ES256',
-    // });
-    // return {
-    //   name: claims.vct,
-    //   issuer: claims.iss,
-    //   issueDate: new Date(claims.iat),
-    //   fields: await vpInstance.presentableKeys(vc),
-    //   rawString: vc,
-    // };
-    return null;
+    return {
+      name: claims.vct,
+      issuer: claims.iss,
+      issueDate: new Date(claims.iat),
+      fields: await vpInstance.presentableKeys(vc),
+      rawString: vc,
+    };
   } catch (e) {
     return null;
   }
@@ -82,7 +74,7 @@ export const makeVP = async (vc: string, fields: string[], nonce: string) => {
     hasher: digest,
     hashAlg: 'SHA-256',
     saltGenerator: generateSalt,
-    kbSigner: await ES256.getSigner(holderPrivateKey),
+    kbSigner: await getSigner(holderPrivateKey),
     kbSignAlg: 'ES256',
   });
 

@@ -13,6 +13,7 @@ type IssueScreenProps = NativeStackScreenProps<RootStackParamList, 'Issue'>;
 const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
   const vw = Dimensions.get('window').width;
   const saveVC = async (vc: string) => {
+    await AsyncStorage.removeItem('credentials');
     console.log(vc);
     const data = await extractData(vc);
     if (!data) {
