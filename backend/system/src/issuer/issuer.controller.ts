@@ -13,8 +13,8 @@ export class IssuerController {
   }
 
   @Get('/vc/career/:id')
-  async findCareerVc(@Param('id') vcId: string): Promise<boolean> {
-    return this.issuerService.findCareerVc(vcId);
+  async findCareerVc(@Param('id') vcDid: string): Promise<boolean> {
+    return this.issuerService.findCareerVc(vcDid);
   }
 
   @Post('/vc/career')

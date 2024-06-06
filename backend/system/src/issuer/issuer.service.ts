@@ -8,6 +8,7 @@ import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerIssuerEmployeeService } from 'src/career_issuer_employee/career_issuer_employee.service';
 import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity';
 import { CareerIssuerEmployeeNonceService } from 'src/career_issuer_employee_nonce/career_issuer_employee_nonce.service';
+import { CareerIssuerCertificateService } from 'src/career_issuer_certificate/career_issuer_certificate.service';
 
 @Injectable()
 export class IssuerService {
@@ -16,9 +17,8 @@ export class IssuerService {
     readonly didResolverService: DidResolverService,
     readonly careerIssuerEmployeeService: CareerIssuerEmployeeService,
     readonly careerIssuerEmployeeNonceService: CareerIssuerEmployeeNonceService,
+    readonly careerIssuerCertificateService: CareerIssuerCertificateService,
   ) {}
-
-  private certificates: string[] = []; //DB table
 
   async makePlayers(playersDidData: PlayersDidData) {
     console.log(
@@ -30,11 +30,10 @@ export class IssuerService {
     await this.jwtService.getIssuer();
   }
 
-  findCareerVc(vcId: string): boolean {
-    console.log(`==issuerService: findCareerVc ${vcId} ==`);
-    const certificate = this.certificates.find(
-      (certificate) => certificate === vcId,
-    );
+  async findCareerVc(vcDid: string): Promise<boolean> {
+    console.log(`==issuerService: findCareerVc ${vcDid} ==`);
+    const certificate =
+      await this.careerIssuerCertificateService.findOneByVcDid(vcDid);
 
     if (!certificate) {
       return false;
@@ -100,7 +99,7 @@ export class IssuerService {
     );
 
     // 3. VC 를 issuer DB 에 저장하고, VC id 를 DID registry 에 등록함
-    this.certificates.push(newVcDid);
+    this.careerIssuerCertificateService.create(newVcDid);
 
     return newVc;
   }

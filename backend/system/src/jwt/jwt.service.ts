@@ -121,7 +121,7 @@ export class JwtService {
       //VP 에 추가되는 Payload
       iat: new Date().getTime(), //VP 만든 시각
       aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
-      nonce: '448982760mock', // 암호화한 난수 - /verifier/nonce/career 응답 + Mock
+      nonce: '1649983664mock', // 암호화한 난수 - /verifier/nonce/career 응답 + Mock
     };
 
     //SDJWTException: Key Binding Signer not found
@@ -228,7 +228,7 @@ export class JwtService {
     // console.log('\nverify\n');
     const verified = await verifierInstance.verify(vp, ['department'], true);
     console.log(
-      ` 5) SDJwtVcInstance.verify() : ${issuerPublicKey}, ${holderPublicKey} 이용`,
+      ` 5) SDJwtVcInstance.verify() : issuer ${issuer.did}, holder ${holder.did} 이용`,
     );
     return verified;
   }

@@ -18,6 +18,8 @@ import { CareerVerifierApplicantNonceModule } from './career_verifier_applicant_
 import { CareerVerifierApplicantNonceEntity } from './entities/career_verifier_applicant_nonce.enity';
 import { TestHolderModule } from './test_holder/test_holder.module';
 import { TestHolderEntity } from './entities/test_holder.entity';
+import { CareerIssuerCertificateModule } from './career_issuer_certificate/career_issuer_certificate.module';
+import { CareerIssuerCertificateEntity } from './entities/career_issuer_certificate.entity';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import { TestHolderEntity } from './entities/test_holder.entity';
         CareerIssuerEmployeeEntity,
         CareerIssuerEmployeeNonceEntity,
         CareerVerifierApplicantNonceEntity,
+        CareerIssuerCertificateEntity,
       ],
     }),
     IssuerModule,
@@ -60,6 +63,7 @@ import { TestHolderEntity } from './entities/test_holder.entity';
     CareerIssuerEmployeeNonceModule,
     CareerVerifierApplicantNonceModule,
     TestHolderModule,
+    CareerIssuerCertificateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
