@@ -3,35 +3,43 @@ import { v4 } from "uuid";
 import { FC, useEffect, useState } from "react";
 
 const Issuer2Page: FC = () => {
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [windowHeight, setWindowHeight] = useState(0);
-
   const useDeepLink = () => {
     const url = "https://dummy.com"; // issuer 2 backend
     const uuid = v4();
     window.open("wwwallet://issue?url=" + url + "&randomString=" + uuid);
   };
 
-  useEffect(() => {
-    setWindowHeight(window.innerHeight);
-    setWindowWidth(window.innerWidth);
-  }, []);
-
   return (
     <Box
       sx={{
         display: "flex",
         flex: 1,
-        justifyContent: "center",
+        justifyContent: "start",
         alignItems: "center",
         flexDirection: "column",
-        width: "100%",
-        height: windowHeight,
+        width: "100vw",
+        height: "100vh",
+        overflow: "auto",
+        backgroundImage: 'url("/issuer2.jpg")',
+        backgroundPosition: "center",
+        backgroundSize: "cover",
       }}
     >
-      <Box sx={{ fontSize: 28 }}>Issuer 2 Main Page</Box>
-      <Box sx={{ flex: 1 }}>
-        <Button onClick={useDeepLink}>{"앱으로 인증서 발급받기"}</Button>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "white",
+          padding: "16px",
+          alignSelf: "center",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{ fontSize: 28 }}>Issuer 2 Main Page</Box>
+        <Box sx={{ flex: 1 }}>
+          <Button onClick={useDeepLink}>{"졸업 증명서 발급받기"}</Button>
+        </Box>
       </Box>
     </Box>
   );
