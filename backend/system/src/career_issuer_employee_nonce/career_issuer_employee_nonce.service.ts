@@ -30,6 +30,7 @@ export class CareerIssuerEmployeeNonceService {
   async findOneByDid(did: string): Promise<CareerIssuerEmployeeNonce> {
     const entity = await this.careerIssuerEmployeeNonceRepository.findOne({
       where: { did },
+      order: { createdAt: 'DESC' }, // 최신순으로 정렬
     });
     if (!entity) {
       throw new Error('Entity not found');

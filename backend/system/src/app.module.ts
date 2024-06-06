@@ -14,6 +14,8 @@ import { CareerIssuerEmployeeModule } from './career_issuer_employee/career_issu
 import { CareerIssuerEmployeeEntity } from './entities/career_issuer_employee.entity';
 import { CareerIssuerEmployeeNonceModule } from './career_issuer_employee_nonce/career_issuer_employee_nonce.module';
 import { CareerIssuerEmployeeNonceEntity } from './entities/career_issuer_employee_nonce.entity';
+import { CareerVerifierApplicantNonceModule } from './career_verifier_applicant_nonce/career_verifier_applicant_nonce.module';
+import { CareerVerifierApplicantNonceEntity } from './entities/career_verifier_applicant_nonce.enity';
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { CareerIssuerEmployeeNonceEntity } from './entities/career_issuer_employ
         CareerIssuerMeEntity,
         CareerIssuerEmployeeEntity,
         CareerIssuerEmployeeNonceEntity,
+        CareerVerifierApplicantNonceEntity,
       ],
     }),
     IssuerModule,
@@ -52,6 +55,7 @@ import { CareerIssuerEmployeeNonceEntity } from './entities/career_issuer_employ
     CareerIssuerMeModule,
     CareerIssuerEmployeeModule,
     CareerIssuerEmployeeNonceModule,
+    CareerVerifierApplicantNonceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

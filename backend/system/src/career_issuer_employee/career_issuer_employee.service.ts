@@ -16,6 +16,7 @@ export class CareerIssuerEmployeeService {
   async findOneByDid(did: string): Promise<CareerIssuerEmployee> {
     const entity = await this.careerIssuerEmployeeRepository.findOne({
       where: { did },
+      order: { createdAt: 'DESC' }, // 최신순으로 정렬
     });
     if (!entity) {
       throw new Error('Entity not found');
