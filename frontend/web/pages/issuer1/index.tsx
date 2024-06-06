@@ -1,12 +1,12 @@
 import { Box, Button } from "@mui/material";
 import { v4 } from "uuid";
-import { FC, useEffect, useState } from "react";
-import issuer1BG from "@/public/issuer1.png";
+import { FC } from "react";
+import { backendHostingURL } from "@/common/config";
 
 const Issuer1Page: FC = () => {
   const useDeepLink = () => {
-    const url = "https://dummy.com"; // issuer 1 backend
-    const uuid = v4();
+    const url = backendHostingURL + "/issuer/vc/career"; // issuer 1 backend
+    const uuid = v4(); // 대신 서버에서 가져와야함
     window.open("wwwallet://issue?url=" + url + "&randomString=" + uuid);
   };
 

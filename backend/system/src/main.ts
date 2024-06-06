@@ -12,6 +12,6 @@ async function bootstrap() {
       transform: true, // movieId number type 으로 변경 가능
     }),
   );
-  await app.listen(3000);
+  await app.listen(8000);
 }
 bootstrap();
