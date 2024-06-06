@@ -1,14 +1,40 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param } from '@nestjs/common';
 import { IssuerService } from './issuer.service';
 import { RequestCareerVcDTO } from './dto/request-career-vc.dto';
-@Controller('career-issuer')
+import { PlayersDidData } from './dto/players-did-data.dto';
+import { RequestNonceForCareerDTO } from './dto/request-nonce-for-career.dto';
+import { EmployeeData } from './dto/employee-data.dto';
+@Controller('issuer')
 export class IssuerController {
-    constructor(readonly issuerService: IssuerService) {}
+  constructor(readonly issuerService: IssuerService) {}
 
-    @Post()
-    async request_vc(@Body() career_vc_request_data: RequestCareerVcDTO): Promise<string>{
-        this.issuerService.start()
-        return await this.issuerService.request_vc(career_vc_request_data)
-    }
+  @Post('/players/career')
+  async makePlayers(@Body() playersDidData: PlayersDidData) {
+    await this.issuerService.makePlayers(playersDidData);
+  }
 
+  @Post('/employee/career')
+  async makeEmployee(@Body() employeeData: EmployeeData) {
+    await this.issuerService.makeEmployee(employeeData);
+  }
+  @Get('/vc/career/:id')
+  async findCareerVc(@Param('id') vcDid: string): Promise<boolean> {
+    return this.issuerService.findCareerVc(vcDid);
+  }
+
+  @Post('/vc/career')
+  async requestCareerVc(
+    @Body() careerVcRequestData: RequestCareerVcDTO,
+  ): Promise<string> {
+    return await this.issuerService.requestCareerVc(careerVcRequestData);
+  }
+
+  @Post('/nonce/career')
+  requestNonceForCareer(
+    @Body() requestNonceForCareerDTO: RequestNonceForCareerDTO,
+  ): number {
+    return this.issuerService.requestNonceForCareer(
+      requestNonceForCareerDTO.holderDid,
+    );
+  }
 }

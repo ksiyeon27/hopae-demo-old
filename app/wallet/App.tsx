@@ -11,15 +11,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import IssueScreen from './src/screens/issue';
-import HomeScreen from './src/screens/home';
 import { RootStackParamList } from '@/navigation/types';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import HomeScreen from '@/screens/home';
+import VerifyScreen from '@/screens/verify';
+import IssueScreen from '@/screens/issue';
 
 const config = {
   screens: {
     Home: 'home',
     Issue: 'issue',
+    Verify: 'verify',
   },
 };
 
@@ -51,6 +53,7 @@ function App(): JSX.Element {
             }}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Issue" component={IssueScreen} />
+            <Stack.Screen name="Verify" component={VerifyScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
