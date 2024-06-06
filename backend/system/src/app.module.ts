@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { IssuerModule } from './issuer/issuer.module';
-import { WalletModule } from './wallet/wallet.module';
+import { VerifierModule } from './verifier/verifier.module';
 import { JwtModule } from './jwt/jwt.module';
 import { DidResolverModule } from './did_resolver/did_resolver.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -46,7 +46,7 @@ import { CareerIssuerEmployeeNonceEntity } from './entities/career_issuer_employ
       ],
     }),
     IssuerModule,
-    WalletModule,
+    VerifierModule,
     JwtModule,
     DidResolverModule,
     CareerIssuerMeModule,

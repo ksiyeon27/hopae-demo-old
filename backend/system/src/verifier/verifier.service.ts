@@ -4,7 +4,7 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 
 @Injectable()
-export class WalletService {
+export class VerifierService {
   constructor(
     readonly jwtService: JwtService,
     readonly didResolverService: DidResolverService,
@@ -13,7 +13,7 @@ export class WalletService {
   async verifyCareerVp(
     careerVpVerifyData: VerifyCareerVpDTO,
   ): Promise<boolean> {
-    console.log('==WalletService: verifyCareerVp==');
+    console.log('==VerifierService: verifyCareerVp==');
 
     // 1. VP 를 sd-jwt 로 verify (kbJwt 시그니처 검증+난수 검증으로 홀더 검증, jwt 시그니처 검증으로 이슈어 검증)
     let verified = null;
