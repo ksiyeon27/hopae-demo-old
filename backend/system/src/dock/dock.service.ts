@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import dock from '@docknetwork/sdk';
 import { createNewDockDID } from '@docknetwork/sdk/utils/did';
-import { dockAddress, secretUri } from 'src/core/dock-constants';
-import { PublicKeyEd25519 } from '@docknetwork/sdk';
+import {
+  dockAddress,
+  secretUriOfEnoughBalanceAccountForDev,
+} from '../core/dock-constants';
+import { PublicKeyEd25519, PublicKeySr25519 } from '@docknetwork/sdk';
 import * as crypto from 'crypto';
 import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
 
@@ -16,12 +19,21 @@ import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
 
 @Injectable()
 export class DockService {
+  secretUriForIssuer1 = '//Issuer1';
+  secretUriForIssuer2 = '//Issuer2';
+  secretUriForVerifier1 = '//Verifier1';
+  secretUriForVerifier2 = '//Verifier2';
+  secretUriForHolder1 = '//Holder1';
+  secretUriForHolder2 = '//Holder2';
+
   async connectToNode() {
     console.log('function --- connectToNode');
     console.log('현재 웹 소켓 로컬 주소를 바탕으로 init한다.');
     await dock.init({ address: dockAddress });
     // dev 모드에서 Alice 계정을 사용한다. Alice는 개발자에게 미리 제공된 계정이다.
-    const account = dock.keyring.addFromUri(secretUri);
+    const account = dock.keyring.addFromUri(
+      secretUriOfEnoughBalanceAccountForDev,
+    );
     dock.setAccount(account);
     console.log('계정을 생성하여 set한다. -> (계정의 주소) ', account.address);
     console.log('이제 기본 연결은 끝났다.');
@@ -48,6 +60,22 @@ export class DockService {
     const pk = new PublicKeyEd25519(bytesAsHex);
     console.log('Public Key Object:', pk);
     return pk;
+  }
+
+  createKeyPairFromSecretUri(secretUri: string) {
+    console.log('function --- createKeyPairFromSecretUri');
+    const keyPair = dock.keyring.addFromUri(secretUri);
+    console.log('KeyPair:', keyPair);
+    return keyPair;
+  }
+
+  async getPublicKeyFromKeyPairAndDid(keyPair, did: string) {
+    console.log('function --- getPublicKeyFromKeyPair');
+    const publicKey = PublicKeySr25519.fromKeyPair(keyPair);
+    console.log('Public Key:', publicKey);
+    const didKey = new DidKey(publicKey, new VerificationRelationship());
+    await dock.did.new(did, [didKey], [], false);
+    return publicKey;
   }
 
   async registerDidWithPublicKey(publicKey, did) {
