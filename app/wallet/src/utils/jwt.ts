@@ -1,8 +1,35 @@
 import { CredentialInfo } from '@/entities/credentialInfo';
-import sdjwt from '@hopae/sd-jwt';
 import { SDJwtInstance } from '@sd-jwt/core';
+import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import { decodeSdJwt, getClaims } from '@sd-jwt/decode';
-import { digest, ES256, generateSalt } from '@sd-jwt/crypto-nodejs';
+import { digest, ES256, generateSalt } from '@sd-jwt/crypto-browser';
+import { HMAC } from 'react-native-simple-crypto';
+import { Buffer } from 'buffer';
+
+// Your secret key (private key for HS256)
+const secretKey = 'your-very-secure-private-key';
+
+const holderPrivateKey = {
+  key_ops: ['sign'],
+  ext: true,
+  kty: 'EC',
+  x: 'oMTflW4aPyHeeV6oey035pd8mdBXmXjWbGf8rGDsGeU',
+  y: 'T25rLoIYNmA2IWP8ke7OUHvmMgFjKvHqEocXVN0sS_M',
+  crv: 'P-256',
+  d: 'fv3L5AdxCyzY3g7zq20p_0aiAOtuTv1N7fyHoedZfeM',
+};
+
+export const dummyEncrypt = (data: string) => {
+  return data + 'mock';
+};
+
+// Function to encrypt a string
+export const encrypt = async (data: string) => {
+  const keyBuffer = Buffer.from(secretKey);
+  const dataBuffer = Buffer.from(data);
+  const hashBuffer = await HMAC.hmac256(dataBuffer, keyBuffer);
+  return Buffer.from(hashBuffer).toString('base64');
+};
 
 const dummyCredential: CredentialInfo = {
   name: '인증서',
@@ -15,32 +42,42 @@ const dummyCredential: CredentialInfo = {
 export const extractData = async (
   vc: string,
 ): Promise<CredentialInfo | null> => {
-  const decodedSdJwt = await decodeSdJwt(vc, digest);
-  const claims: any = await getClaims(
-    decodedSdJwt.jwt.payload,
-    decodedSdJwt.disclosures,
-    digest,
-  );
-  return {
-    name: claims.vct,
-    issuer: claims.iss,
-    issueDate: new Date(claims.iat),
-    fields: await sdjwt.presentableKeys(vc),
-    rawString: vc,
-  };
+  try {
+    console.log('--------------1');
+    const instance = new SDJwtVcInstance({
+      hasher: digest,
+      hashAlg: 'SHA-256',
+      saltGenerator: generateSalt,
+    });
+    const decodedSdJwt = await instance.decode(vc);
+    console.log(decodedSdJwt);
+    console.log('--------------2');
+    // const claims: any = await getClaims(
+    //   decodedSdJwt.jwt.payload,
+    //   decodedSdJwt.disclosures,
+    //   digest,
+    // );
+    // const vpInstance = new SDJwtInstance({
+    //   hasher: digest,
+    //   hashAlg: 'SHA-256',
+    //   saltGenerator: generateSalt,
+    //   kbSigner: await ES256.getSigner(holderPrivateKey),
+    //   kbSignAlg: 'ES256',
+    // });
+    // return {
+    //   name: claims.vct,
+    //   issuer: claims.iss,
+    //   issueDate: new Date(claims.iat),
+    //   fields: await vpInstance.presentableKeys(vc),
+    //   rawString: vc,
+    // };
+    return null;
+  } catch (e) {
+    return null;
+  }
 };
 
 export const makeVP = async (vc: string, fields: string[], nonce: string) => {
-  const holderPrivateKey = {
-    key_ops: ['sign'],
-    ext: true,
-    kty: 'EC',
-    x: 'oMTflW4aPyHeeV6oey035pd8mdBXmXjWbGf8rGDsGeU',
-    y: 'T25rLoIYNmA2IWP8ke7OUHvmMgFjKvHqEocXVN0sS_M',
-    crv: 'P-256',
-    d: 'fv3L5AdxCyzY3g7zq20p_0aiAOtuTv1N7fyHoedZfeM',
-  };
-
   const vpInstance = new SDJwtInstance({
     hasher: digest,
     hashAlg: 'SHA-256',

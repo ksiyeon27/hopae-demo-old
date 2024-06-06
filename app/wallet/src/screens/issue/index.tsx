@@ -3,14 +3,18 @@ import { RootStackParamList } from '@/navigation/types';
 import React, { FC, useEffect } from 'react';
 import { Alert, Dimensions, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { extractData } from '@/utils/jwt';
+import { dummyEncrypt, encrypt, extractData } from '@/utils/jwt';
 import axios from 'axios';
+import { holderDid } from '@/common/const';
+
+const dummyNonce = 'nonce1';
 
 type IssueScreenProps = NativeStackScreenProps<RootStackParamList, 'Issue'>;
 const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
   const vw = Dimensions.get('window').width;
   const saveVC = async (vc: string) => {
-    const data = extractData(vc);
+    console.log(vc);
+    const data = await extractData(vc);
     if (!data) {
       Alert.alert(
         '인증서가 잘못된 형식입니다',
@@ -19,14 +23,14 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
           {
             text: '확인',
             onPress: () => {
-              navigation.goBack();
+              navigation.navigate('Home');
             },
           },
         ],
         {
           cancelable: true,
           onDismiss: () => {
-            navigation.goBack();
+            navigation.navigate('Home');
           },
         },
       );
@@ -45,14 +49,14 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
         {
           text: '확인',
           onPress: () => {
-            navigation.goBack();
+            navigation.navigate('Home');
           },
         },
       ],
       {
         cancelable: true,
         onDismiss: () => {
-          navigation.goBack();
+          navigation.navigate('Home');
         },
       },
     );
@@ -67,33 +71,47 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
           {
             text: '확인',
             onPress: () => {
-              navigation.goBack();
+              navigation.navigate('Home');
             },
           },
         ],
         {
           cancelable: true,
           onDismiss: () => {
-            navigation.goBack();
+            navigation.navigate('Home');
           },
         },
       );
       return;
     }
-    saveVC('dumdumdummy');
-    // axios.post(route.params.url, route.params.randomString).then((res) => {
-    //   saveVC(res.data)
-    //     .then(() => {
-    //       Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
-    //     })
-    //     .catch((e) => {
-    //       console.error(e);
-    //       Alert.alert('인증서 저장에 실패했습니다');
-    //     })
-    //     .finally(() => {
-    //       navigation.goBack();
-    //     });
-    // });
+
+    const _inner = async () => {
+      // const encrypted = await encrypt(dummyNonce);
+      console.log(route.params.url);
+      axios
+        .post(route.params.url, {
+          holderDid: holderDid,
+          orignalNonce: dummyNonce,
+          encryptedNonce: dummyEncrypt(dummyNonce),
+        })
+        .then((res) => {
+          saveVC(res.data)
+            .then(() => {
+              Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
+            })
+            .catch((e) => {
+              console.error(e);
+              Alert.alert('인증서 저장에 실패했습니다');
+            })
+            .finally(() => {
+              navigation.goBack();
+            });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    };
+    _inner();
   }, [route.params]);
 
   return (

@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialInfo } from '@/entities/credentialInfo';
 import { extractData } from '@/utils/jwt';
 import { useIsFocused } from '@react-navigation/native';
+import { frontendHostingUrl } from '@/common/config';
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -28,9 +29,15 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
     if (!isFocused) return;
     const _getData = async () => {
       const creds = await AsyncStorage.getItem('credentials');
-      setCredentials(
-        (creds ? JSON.parse(creds) : []).map((c: string) => extractData(c)),
-      );
+      if (creds) {
+        const parsedCreds = JSON.parse(creds);
+        const extractedCreds = await Promise.all(
+          parsedCreds.map((c: string) => extractData(c)),
+        );
+        setCredentials(extractedCreds.filter((c) => c !== null));
+      } else {
+        setCredentials([]);
+      }
     };
     _getData().catch((e) => {
       console.error(e);
@@ -107,7 +114,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
       </View>
       <TouchableWithoutFeedback
         onPress={() => {
-          Linking.openURL('https://f499-147-47-202-15.ngrok-free.app/issuer1');
+          Linking.openURL(frontendHostingUrl + '/issuer1');
         }}>
         <View
           style={{
