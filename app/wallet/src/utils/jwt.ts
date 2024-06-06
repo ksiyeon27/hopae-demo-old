@@ -1,10 +1,9 @@
 import { CredentialInfo } from '@/entities/credentialInfo';
 import { SDJwtInstance } from '@sd-jwt/core';
-import { decodeJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
+import { decodeSdJwt, getClaims } from '@sd-jwt/decode';
 import { digest, generateSalt, getSigner } from '@/utils/crypto';
 import { HMAC } from 'react-native-simple-crypto';
 import { Buffer } from 'buffer';
-import { Base64 } from 'js-base64';
 
 // Your secret key (private key for HS256)
 const secretKey = 'your-very-secure-private-key';

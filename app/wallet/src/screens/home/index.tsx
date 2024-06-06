@@ -131,9 +131,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback
         onPress={() => {
-          Linking.openURL(
-            'https://f499-147-47-202-15.ngrok-free.app/verifier1',
-          );
+          Linking.openURL(frontendHostingUrl + '/verifier1');
         }}>
         <View
           style={{
