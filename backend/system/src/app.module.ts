@@ -1,7 +1,3 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { IssuerModule } from './issuer/issuer.module';
 import { VerifierModule } from './verifier/verifier.module';
 import { JwtModule } from './jwt/jwt.module';
 import { DidResolverModule } from './did_resolver/did_resolver.module';
@@ -20,6 +16,11 @@ import { TestHolderModule } from './test_holder/test_holder.module';
 import { TestHolderEntity } from './entities/test_holder.entity';
 import { CareerIssuerCertificateModule } from './career_issuer_certificate/career_issuer_certificate.module';
 import { CareerIssuerCertificateEntity } from './entities/career_issuer_certificate.entity';
+import { DockModule } from './dock/dock.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { IssuerModule } from './issuer/issuer.module';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { CareerIssuerCertificateEntity } from './entities/career_issuer_certific
     CareerVerifierApplicantNonceModule,
     TestHolderModule,
     CareerIssuerCertificateModule,
+    DockModule,
   ],
   controllers: [AppController],
   providers: [AppService],
