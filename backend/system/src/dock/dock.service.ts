@@ -63,18 +63,16 @@ export class DockService {
   }
 
   createKeyPairFromSecretUri(secretUri: string) {
-    console.log('function --- createKeyPairFromSecretUri');
+    console.log('function --- createKeyPairFromSecretUri', secretUri);
     const keyPair = dock.keyring.addFromUri(secretUri);
     console.log('KeyPair:', keyPair);
     return keyPair;
   }
 
-  async getPublicKeyFromKeyPairAndDid(keyPair, did: string) {
+  getSr25519PublicKeyFromKeyPair(keypair) {
     console.log('function --- getPublicKeyFromKeyPair');
-    const publicKey = PublicKeySr25519.fromKeyPair(keyPair);
+    const publicKey = PublicKeySr25519.fromKeyringPair(keypair);
     console.log('Public Key:', publicKey);
-    const didKey = new DidKey(publicKey, new VerificationRelationship());
-    await dock.did.new(did, [didKey], [], false);
     return publicKey;
   }
 
@@ -95,8 +93,13 @@ export class DockService {
 
   async resolveDid(did: string) {
     console.log('function --- resolveDid');
-    const result = await dock.did.getDocument(did);
-    console.log('Resolved DID:', result);
-    return result;
+    try {
+      const result = await dock.did.getDocument(did);
+      console.log('Resolved DID:', result);
+      return result;
+    } catch (error) {
+      console.log('error', error);
+      return undefined;
+    }
   }
 }

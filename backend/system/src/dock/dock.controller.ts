@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DockService } from './dock.service';
+import { DockUpdateService } from './dock.update.service';
 
 @Controller('dock')
 export class DockController {
-  constructor(private dockService: DockService) {}
+  constructor(
+    private dockService: DockService,
+    private dockUpdateService: DockUpdateService,
+  ) {}
 
   // 기본적인 dock resolver 역할을 수행한다.
   @Get('resolve')
@@ -14,6 +18,9 @@ export class DockController {
     }
     const result = await this.dockService.resolveDid(did);
     await this.dockService.disconnectNode();
+    if (result === undefined) {
+      return '해당 did에 대한 정보가 없습니다.';
+    }
     return result;
   }
 
@@ -21,8 +28,8 @@ export class DockController {
   // 아무런 옵션이 없는 현재 상태에서는 did, pk 모두 랜덤 값을 바탕으로 생성된다.
   // 현재 함수 구성 중, cratePublicKeyObjectByBytesAxHex 함수를 통해 생성한 pulic key는 private key를 따로 저장하고 있지 않다.
   // 그러므로, 이 api를 통해 생성한 결과는 did doc을 추후 조작하는데 있어서 사용할 수가 없다.
-  @Post('register')
-  async registerDid() {
+  @Post('register-random')
+  async registerDidWithRandomPk() {
     await this.dockService.connectToNode();
     const did = this.dockService.createRandomDid();
     const bytesAsHex = this.dockService.getRandomBytesAsHex();
@@ -36,5 +43,39 @@ export class DockController {
         pk,
       },
     };
+  }
+
+  @Post('register')
+  async registerDidWithSecretUri(@Body('secretUri') secretUri: string) {
+    await this.dockService.connectToNode();
+    const did = this.dockService.createRandomDid();
+    const keyPair = this.dockService.createKeyPairFromSecretUri(secretUri);
+    const pk = this.dockService.getSr25519PublicKeyFromKeyPair(keyPair);
+    await this.dockService.registerDidWithPublicKey(pk, did);
+    await this.dockService.disconnectNode();
+    return {
+      msg: 'success',
+      detail: {
+        did,
+        pk,
+      },
+    };
+  }
+
+  @Get('test')
+  test() {
+    return this.dockUpdateService.test();
+  }
+
+  @Post('add-key')
+  async addKey(@Body() body: { did: string; secretUri: string }) {
+    if (!body.did || !body.secretUri) {
+      return 'did, secretUri를 넣어주세요';
+    }
+    const { did, secretUri } = body;
+    await this.dockService.connectToNode();
+    await this.dockUpdateService.addKey({ did, secretUri });
+    await this.dockService.disconnectNode();
+    return 'fin';
   }
 }
