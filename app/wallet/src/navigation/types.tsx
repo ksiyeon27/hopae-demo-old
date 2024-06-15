@@ -1,10 +1,10 @@
 export type IssueParams = {
-  randomString: string;
+  nonceUrl: string;
   url: string;
 };
 
 export type VerifyParams = {
-  randomString: string;
+  nonceUrl: string;
   url: string;
   fields: string;
 };

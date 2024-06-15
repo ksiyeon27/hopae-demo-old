@@ -1,1 +1,1 @@
-export const frontendHostingUrl = 'https://4063-222-112-35-32.ngrok-free.app';
+export const frontendHostingUrl = 'https://5493-121-170-212-116.ngrok-free.app';

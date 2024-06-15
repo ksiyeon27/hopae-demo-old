@@ -16,6 +16,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import HomeScreen from '@/screens/home';
 import VerifyScreen from '@/screens/verify';
 import IssueScreen from '@/screens/issue';
+import PolyfillCrypto from 'react-native-webview-crypto';
 
 const config = {
   screens: {
