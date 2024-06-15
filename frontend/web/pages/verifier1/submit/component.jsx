@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { backendHostingURL } from "@/common/config";
 
 export default function Component() {
   const useDeepLink = () => {
