@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { v4 } from "uuid";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Component() {
   const useDeepLink = () => {
-    const url = "https://dummy.com"; // verifier 2 backend
-    const uuid = v4();
+    const url = backendHostingURL + "/verifier/vp/career"; // verifier 2 backend
+    const nonceUrl = backendHostingURL + "/verifier/nonce/career"; // 대신 서버에서 가져와야함
     const fields = ["name", "age"];
     window.open(
       "wwwallet://verify?url=" +
         url +
-        "&randomString=" +
-        uuid +
+        "&nonceUrl=" +
+        nonceUrl +
         "&fields=" +
         fields.join(",")
     );

@@ -1,19 +1,18 @@
-import { v4 } from "uuid";
 import { useEffect } from "react";
-import Link from "next/link"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function Component() {
   const useDeepLink = () => {
-    const url = "https://dummy.com"; // verifier 1 backend
-    const uuid = v4();
-    const fields = ["나이", "성별", "국가"];
+    const url = backendHostingURL + "/verifier/vp/career"; // verifier 1 backend
+    const nonceUrl = backendHostingURL + "/verifier/nonce/career"; // 대신 서버에서 가져와야함
+    const fields = ["department", "position", "join", "leave"];
     window.open(
       "wwwallet://verify?url=" +
         url +
-        "&randomString=" +
-        uuid +
+        "&nonceUrl=" +
+        nonceUrl +
         "&fields=" +
         fields.join(",")
     );
