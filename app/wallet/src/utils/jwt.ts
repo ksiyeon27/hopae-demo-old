@@ -8,14 +8,14 @@ import { Buffer } from 'buffer';
 // Your secret key (private key for HS256)
 const secretKey = 'your-very-secure-private-key';
 
-const holderPrivateKey = {
+export const holderPrivateKey = {
   key_ops: ['sign'],
   ext: true,
   kty: 'EC',
-  x: 'oMTflW4aPyHeeV6oey035pd8mdBXmXjWbGf8rGDsGeU',
-  y: 'T25rLoIYNmA2IWP8ke7OUHvmMgFjKvHqEocXVN0sS_M',
+  x: 'SKe8y2LIr5ig9YMF1kV08wOvCUKGndAp_77AargmDTA',
+  y: '3cC13BAJCLIFUQqImQXRndHL4vwvO-h0OdPSHah_qCQ',
   crv: 'P-256',
-  d: 'fv3L5AdxCyzY3g7zq20p_0aiAOtuTv1N7fyHoedZfeM',
+  d: '0z6YrIvfSiThDDSoxwA81csdxuU5DRFVZSYXE9X-A4w',
 };
 
 export const dummyEncrypt = (data: string) => {
@@ -28,14 +28,6 @@ export const encrypt = async (data: string) => {
   const dataBuffer = Buffer.from(data);
   const hashBuffer = await HMAC.hmac256(dataBuffer, keyBuffer);
   return Buffer.from(hashBuffer).toString('base64');
-};
-
-const dummyCredential: CredentialInfo = {
-  name: '인증서',
-  issuer: '발급기관 A',
-  issueDate: new Date(2023, 10, 22),
-  fields: ['나이', '성별', '국가'], // 공개 여부를 선택할 수 있는 claim들의 key
-  rawString: 'abnkbankankanknaknlq12312@32n4k123@!!#', // vc 원본
 };
 
 export const extractData = async (
@@ -53,7 +45,7 @@ export const extractData = async (
       hasher: digest,
       hashAlg: 'SHA-256',
       saltGenerator: generateSalt,
-      kbSigner: await getSigner(holderPrivateKey),
+      kbSigner: undefined,
       kbSignAlg: 'ES256',
     });
     return {
@@ -74,7 +66,7 @@ export const makeVP = async (vc: string, fields: string[], nonce: string) => {
     hashAlg: 'SHA-256',
     saltGenerator: generateSalt,
     kbSigner: await getSigner(holderPrivateKey),
-    kbSignAlg: 'ES256',
+    kbSignAlg: 'EdDSA',
   });
 
   let presentationFrame: { [key: string]: boolean } = {};

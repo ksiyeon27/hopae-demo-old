@@ -42,7 +42,7 @@ export class VerifierService {
     const payload: any = verified.payload;
     const vcId = payload.id.toString();
     console.log(vcId);
-    const res = await fetch(`http://localhost:3000/issuer/vc/career/${vcId}`, {
+    const res = await fetch(`http://localhost:8000/issuer/vc/career/${vcId}`, {
       method: 'GET',
     });
     const find = await res.json();

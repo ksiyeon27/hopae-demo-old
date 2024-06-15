@@ -64,55 +64,45 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    if (!route.params.url || !route.params.randomString) {
+    if (!route.params.url || !route.params.nonceUrl) {
+      Alert.alert('비정상적인 접근입니다');
+      navigation.goBack();
+      return;
+    }
+
+    const _inner = async () => {
+      const nonceRes = await axios.post(route.params.nonceUrl, {
+        holderDid: holderDid,
+      });
+      const res = await axios.post(route.params.url, {
+        holderDid: holderDid,
+        encryptedNonce: dummyEncrypt(nonceRes.data),
+      });
+      await saveVC(res.data);
+      Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
+      navigation.goBack();
+    };
+    _inner().catch((e) => {
+      console.error(e);
       Alert.alert(
-        '비정상적인 접근입니다',
+        '인증서 발급에 실패했습니다',
         '',
         [
           {
             text: '확인',
             onPress: () => {
-              navigation.navigate('Home');
+              navigation.goBack();
             },
           },
         ],
         {
           cancelable: true,
           onDismiss: () => {
-            navigation.navigate('Home');
+            navigation.goBack();
           },
         },
       );
-      return;
-    }
-
-    const _inner = async () => {
-      // const encrypted = await encrypt(dummyNonce);
-      console.log(route.params.url);
-      axios
-        .post(route.params.url, {
-          holderDid: holderDid,
-          orignalNonce: dummyNonce,
-          encryptedNonce: dummyEncrypt(dummyNonce),
-        })
-        .then((res) => {
-          saveVC(res.data)
-            .then(() => {
-              Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
-            })
-            .catch((e) => {
-              console.error(e);
-              Alert.alert('인증서 저장에 실패했습니다');
-            })
-            .finally(() => {
-              navigation.goBack();
-            });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    };
-    _inner();
+    });
   }, [route.params]);
 
   return (
