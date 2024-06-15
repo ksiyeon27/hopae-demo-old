@@ -24,10 +24,8 @@ export const dummyEncrypt = (data: string) => {
 
 // Function to encrypt a string
 export const encrypt = async (data: string) => {
-  const keyBuffer = Buffer.from(secretKey);
-  const dataBuffer = Buffer.from(data);
-  const hashBuffer = await HMAC.hmac256(dataBuffer, keyBuffer);
-  return Buffer.from(hashBuffer).toString('base64');
+  const signer = getSigner(holderPrivateKey);
+  return await signer(data);
 };
 
 export const extractData = async (
