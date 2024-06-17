@@ -23,6 +23,8 @@ import { IssuerModule } from './issuer/issuer.module';
 import { Module } from '@nestjs/common';
 import { GeneticTestIssuerMeModule } from './genetic_test_issuer_me/genetic_test_issuer_me.module';
 import { GeneticTestIssuerMeEntity } from './entities/genetic_test_issuer_me.entity';
+import { GeneticTestIssuerTesterNonceModule } from './genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.module';
+import { GeneticTestIssuerTesterNonceEntity } from './entities/genetic_test_issuer_tester_nonce.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -55,6 +57,7 @@ import { GeneticTestIssuerMeEntity } from './entities/genetic_test_issuer_me.ent
         CareerVerifierApplicantNonceEntity,
         CareerIssuerCertificateEntity,
         GeneticTestIssuerMeEntity,
+        GeneticTestIssuerTesterNonceEntity,
       ],
     }),
     IssuerModule,
@@ -69,6 +72,7 @@ import { GeneticTestIssuerMeEntity } from './entities/genetic_test_issuer_me.ent
     CareerIssuerCertificateModule,
     DockModule,
     GeneticTestIssuerMeModule,
+    GeneticTestIssuerTesterNonceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

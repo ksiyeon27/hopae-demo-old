@@ -68,7 +68,7 @@ export class IssuerController {
   requestNonceForGeneticTest(
     @Body() requestNonceFromIssuerDTO: RequestNonceFromIssuerDTO,
   ): number {
-    return this.issuerService.requestNonceForCareer(
+    return this.issuerService.requestNonceForGeneticTest(
       requestNonceFromIssuerDTO.holderDid,
     );
   }

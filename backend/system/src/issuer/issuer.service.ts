@@ -10,6 +10,7 @@ import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity
 import { CareerIssuerEmployeeNonceService } from 'src/career_issuer_employee_nonce/career_issuer_employee_nonce.service';
 import { CareerIssuerCertificateService } from 'src/career_issuer_certificate/career_issuer_certificate.service';
 import { EmployeeData } from './dto/employee-data.dto';
+import { GeneticTestIssuerTesterNonceService } from 'src/genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.service';
 
 @Injectable()
 export class IssuerService {
@@ -18,6 +19,7 @@ export class IssuerService {
     readonly didResolverService: DidResolverService,
     readonly careerIssuerEmployeeService: CareerIssuerEmployeeService,
     readonly careerIssuerEmployeeNonceService: CareerIssuerEmployeeNonceService,
+    readonly geneticTestIssuerTesterNonceService: GeneticTestIssuerTesterNonceService,
     readonly careerIssuerCertificateService: CareerIssuerCertificateService,
   ) {}
 
@@ -56,11 +58,22 @@ export class IssuerService {
   }
 
   requestNonceForCareer(holderDid: string): number {
+    console.log('==issuerService: requestNonceForCareer==');
     // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
     const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
 
     // career_issuer_employee_nonce 테이블에 저장하기
     this.careerIssuerEmployeeNonceService.create(holderDid, nonce);
+    return nonce;
+  }
+
+  requestNonceForGeneticTest(holderDid: string): number {
+    console.log('==issuerService: requestNonceForGeneticTest==');
+    // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
+    const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
+
+    // genetic_test_issuer_tester_nonce 테이블에 저장하기
+    this.geneticTestIssuerTesterNonceService.create(holderDid, nonce);
     return nonce;
   }
 
