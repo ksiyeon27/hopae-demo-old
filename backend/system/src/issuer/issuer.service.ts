@@ -11,6 +11,8 @@ import { CareerIssuerEmployeeNonceService } from 'src/career_issuer_employee_non
 import { CareerIssuerCertificateService } from 'src/career_issuer_certificate/career_issuer_certificate.service';
 import { EmployeeData } from './dto/employee-data.dto';
 import { GeneticTestIssuerTesterNonceService } from 'src/genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.service';
+import { GeneticTestResultData } from './dto/genetic-test-result-data.dto';
+import { GeneticTestIssuerResultService } from 'src/genetic_test_issuer_result/genetic_test_issuer_result.service';
 
 @Injectable()
 export class IssuerService {
@@ -18,6 +20,7 @@ export class IssuerService {
     readonly jwtService: JwtService,
     readonly didResolverService: DidResolverService,
     readonly careerIssuerEmployeeService: CareerIssuerEmployeeService,
+    readonly geneticTestIssuerResultService: GeneticTestIssuerResultService,
     readonly careerIssuerEmployeeNonceService: CareerIssuerEmployeeNonceService,
     readonly geneticTestIssuerTesterNonceService: GeneticTestIssuerTesterNonceService,
     readonly careerIssuerCertificateService: CareerIssuerCertificateService,
@@ -42,6 +45,19 @@ export class IssuerService {
       employeeData.salary,
       new Date(employeeData.join),
       new Date(employeeData.leave),
+    );
+  }
+
+  async makeGeneticTestResult(geneticTestResultData: GeneticTestResultData) {
+    console.log(`==issuerService: makeGeneticTestResult`);
+    await this.geneticTestIssuerResultService.create(
+      geneticTestResultData.did,
+      geneticTestResultData.hairLossGeneHeritability,
+      geneticTestResultData.dermatitisGeneHeritability,
+      geneticTestResultData.stomachCancerRisk,
+      geneticTestResultData.lungsCancerRisk,
+      geneticTestResultData.liverCancerRisk,
+      geneticTestResultData.pancreasCancerRisk,
     );
   }
 

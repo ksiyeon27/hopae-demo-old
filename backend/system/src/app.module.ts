@@ -25,6 +25,8 @@ import { GeneticTestIssuerMeModule } from './genetic_test_issuer_me/genetic_test
 import { GeneticTestIssuerMeEntity } from './entities/genetic_test_issuer_me.entity';
 import { GeneticTestIssuerTesterNonceModule } from './genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.module';
 import { GeneticTestIssuerTesterNonceEntity } from './entities/genetic_test_issuer_tester_nonce.entity';
+import { GeneticTestIssuerResultModule } from './genetic_test_issuer_result/genetic_test_issuer_result.module';
+import { GeneticTestIssuerResultEntity } from './entities/genetic_test_issuer_result.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -57,6 +59,7 @@ import { GeneticTestIssuerTesterNonceEntity } from './entities/genetic_test_issu
         CareerVerifierApplicantNonceEntity,
         CareerIssuerCertificateEntity,
         GeneticTestIssuerMeEntity,
+        GeneticTestIssuerResultEntity,
         GeneticTestIssuerTesterNonceEntity,
       ],
     }),
@@ -73,6 +76,7 @@ import { GeneticTestIssuerTesterNonceEntity } from './entities/genetic_test_issu
     DockModule,
     GeneticTestIssuerMeModule,
     GeneticTestIssuerTesterNonceModule,
+    GeneticTestIssuerResultModule,
   ],
   controllers: [AppController],
   providers: [AppService],

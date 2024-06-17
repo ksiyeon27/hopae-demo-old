@@ -4,6 +4,7 @@ import { RequestCareerVcDTO } from './dto/request-career-vc.dto';
 import { PlayersDidData } from './dto/players-did-data.dto';
 import { RequestNonceFromIssuerDTO } from './dto/request-nonce-for-career.dto';
 import { EmployeeData } from './dto/employee-data.dto';
+import { GeneticTestResultData } from './dto/genetic-test-result-data.dto';
 @Controller('issuer')
 export class IssuerController {
   constructor(readonly issuerService: IssuerService) {}
@@ -50,8 +51,10 @@ export class IssuerController {
   }
 
   @Post('/result/genetic-test')
-  async makeGeneticTestResult(@Body() employeeData: EmployeeData) {
-    await this.issuerService.makeEmployee(employeeData);
+  async makeGeneticTestResult(
+    @Body() geneticTestResultData: GeneticTestResultData,
+  ) {
+    await this.issuerService.makeGeneticTestResult(geneticTestResultData);
   }
 
   @Post('/nonce/genetic-test')
