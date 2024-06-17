@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class RequestNonceForCareerDTO {
+export class RequestNonceFromIssuerDTO {
   @IsString()
   readonly holderDid: string;
 }

@@ -21,14 +21,14 @@ export class IssuerService {
     readonly careerIssuerCertificateService: CareerIssuerCertificateService,
   ) {}
 
-  async makePlayers(playersDidData: PlayersDidData) {
-    console.log(
-      `==issuerService: makePlayers ${playersDidData.holderDid}, ${playersDidData.issuerDid}`,
-    );
-    await this.jwtService.createPlayer(playersDidData.holderDid, 'holder');
-    await this.jwtService.createPlayer(playersDidData.issuerDid, 'issuer');
-    await this.jwtService.getHolderByDid(playersDidData.holderDid);
-    await this.jwtService.getIssuer();
+  async makeIssuer(issuerDid: string, type: string) {
+    console.log(`==issuerService: makeIssuer ${issuerDid} for ${type}`);
+    await this.jwtService.createIssuer(issuerDid, type);
+  }
+
+  async makeHolder(holderDid: string) {
+    console.log(`==issuerService: makeHolder ${holderDid}`);
+    await this.jwtService.createHolder(holderDid);
   }
 
   async makeEmployee(employeeData: EmployeeData) {
