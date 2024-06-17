@@ -1,12 +1,15 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DockService } from './dock.service';
 import { DockUpdateService } from './dock.update.service';
+import { UtilService } from './util_service/util.service';
+import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 @Controller('dock')
 export class DockController {
   constructor(
     private dockService: DockService,
     private dockUpdateService: DockUpdateService,
+    private utilService: UtilService,
   ) {}
 
   // 기본적인 dock resolver 역할을 수행한다.
@@ -22,6 +25,22 @@ export class DockController {
       return '해당 did에 대한 정보가 없습니다.';
     }
     return result;
+  }
+  @Get('resolve/jwk')
+  async getDidAndJwk(@Query('did') did: string | undefined) {
+    await this.dockService.connectToNode();
+    if (!did) {
+      return 'did를 넣어주세용';
+    }
+    const result = await this.dockService.resolveDid(did);
+    await this.dockService.disconnectNode();
+    if (result === undefined) {
+      return '해당 did에 대한 정보가 없습니다.';
+    }
+    const jwk = this.utilService.aggregateBase58KeysToJwk(
+      result.publicKey.map((e) => e.publicKeyBase58),
+    );
+    return jwk;
   }
 
   // dock substrate network에 did를 등록한다.
@@ -45,7 +64,7 @@ export class DockController {
     };
   }
 
-  @Post('register')
+  @Post('register-secretUri')
   async registerDidWithSecretUri(@Body('secretUri') secretUri: string) {
     await this.dockService.connectToNode();
     const did = this.dockService.createRandomDid();
@@ -62,9 +81,33 @@ export class DockController {
     };
   }
 
-  @Get('test')
-  test() {
-    return this.dockUpdateService.test();
+  @Post('register-jwk')
+  async registerDidWithJwk(@Body('jwk') jwk?: JsonWebKey) {
+    let jwkToUse: JsonWebKey;
+    await this.dockService.connectToNode();
+    try {
+      if (jwk === undefined) {
+        console.log('jwk 그냥 새로 생성!');
+        jwkToUse = (await ES256.generateKeyPair()).publicKey;
+      } else {
+        console.log('jwk 받은 거 사용!');
+        jwkToUse = jwk;
+      }
+      console.log('jwkToUse - pulic key :', jwkToUse);
+      const did = this.dockService.createRandomDid();
+      const didKeys = this.utilService.publicJwkToDidKeys(jwkToUse);
+      await this.dockService.registerDidWithDidKeys(didKeys, did);
+      return {
+        msg: 'success',
+        detail: {
+          did,
+          jwkToUse,
+        },
+      };
+    } catch (error) {
+    } finally {
+      await this.dockService.disconnectNode();
+    }
   }
 
   @Post('add-key')

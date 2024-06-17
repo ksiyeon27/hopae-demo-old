@@ -8,6 +8,9 @@ import {
 import { PublicKeyEd25519, PublicKeySr25519 } from '@docknetwork/sdk';
 import * as crypto from 'crypto';
 import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
+import { MockPublicKey } from './mock_public_key';
+import { UtilService } from './util_service/util.service';
+import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 // pre defined random bytes as hex
 // 혹시 몰라 미리 생성해놨고, 쓰인다면 이건 고정 seed로 사용될 것이다.
@@ -19,6 +22,8 @@ import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
 
 @Injectable()
 export class DockService {
+  constructor(readonly utilService: UtilService) {}
+
   secretUriForIssuer1 = '//Issuer1';
   secretUriForIssuer2 = '//Issuer2';
   secretUriForVerifier1 = '//Verifier1';
@@ -81,10 +86,14 @@ export class DockService {
     // verification method 등, did doc을 구성함에 있어서 필요한 정보를 세팅하는 객체인 듯 하다.
     // set 을 통해 아래 객체를 더 조작할 수 있으나 하지 않고 기본으로 사용한다.
     const vr = new VerificationRelationship();
-    const didKey = new DidKey(publicKey, new VerificationRelationship());
+    const didKey = new DidKey(publicKey, vr);
     await dock.did.new(did, [didKey], [], false);
   }
 
+  async registerDidWithDidKeys(didKeys: DidKey[], did: string) {
+    console.log('function --- registerDidWithDidKeys');
+    await dock.did.new(did, didKeys, [], false);
+  }
   async disconnectNode() {
     console.log('function --- disconnectNode');
     await dock.disconnect();
@@ -95,7 +104,6 @@ export class DockService {
     console.log('function --- resolveDid');
     try {
       const result = await dock.did.getDocument(did);
-      console.log('Resolved DID:', result);
       return result;
     } catch (error) {
       console.log('error', error);

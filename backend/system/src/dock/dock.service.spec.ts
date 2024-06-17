@@ -1,16 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DockService } from './dock.service';
 import exp from 'constants';
+import { UtilService } from './util_service/util.service';
+import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 describe('DockService', () => {
   let service: DockService;
+  let utilService: UtilService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DockService],
+      providers: [DockService, UtilService],
     }).compile();
 
     service = module.get<DockService>(DockService);
+    utilService = module.get<UtilService>(UtilService);
   });
 
   it('should be defined - random did', () => {
@@ -42,6 +46,53 @@ describe('DockService', () => {
     ]);
     await service.disconnectNode();
     expect(compareUint8Arrays(keypair.publicKey, wrongResult)).toBeFalsy();
+  });
+
+  it('should', async () => {
+    const keypair = await ES256.generateKeyPair();
+    const didKeys = utilService.publicJwkToDidKeys(keypair.publicKey);
+    console.log('didKeys :', didKeys);
+  });
+
+  it('should become jwk', async () => {
+    const publicKeyInfoArray = [
+      {
+        id: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37#keys-1',
+        type: 'Sr25519VerificationKey2020',
+        controller: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37',
+        publicKeyBase58: '9Hfb5kj5eNUY1fAX5g9Y1UEM7xdXwZ4tPGgk2E9rwBbA',
+      },
+      {
+        id: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37#keys-2',
+        type: 'Sr25519VerificationKey2020',
+        controller: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37',
+        publicKeyBase58: '3yHP2Ju1JGkqH736Ym6HZjUwdXADqddXucgoNKWE3WgS',
+      },
+      {
+        id: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37#keys-3',
+        type: 'Sr25519VerificationKey2020',
+        controller: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37',
+        publicKeyBase58: '7tgNufQDX86qTuz76SxKGLPihm3amyjHYQWAUdD7NoFn',
+      },
+      {
+        id: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37#keys-4',
+        type: 'Sr25519VerificationKey2020',
+        controller: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37',
+        publicKeyBase58: '3JcGzFjjf5iy1ydM1Kc2aj7ntjPW2UKMAvrhTQMdf5de',
+      },
+      {
+        id: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37#keys-5',
+        type: 'Sr25519VerificationKey2020',
+        controller: 'did:dock:5ERsC6g1969UdsTg1JzzYAby2pzJFov4r5S7A8GYpX9Vfr37',
+        publicKeyBase58: '6LyTtyNCHbhegQpjHzsox4Pb6kghEZKzuAukaZpUhPUT',
+      },
+    ];
+    const stringified = publicKeyInfoArray
+      .map((e) => utilService._decodeBase58(e.publicKeyBase58))
+      .join('');
+    const parsed = JSON.parse(stringified);
+    console.log(parsed);
+    expect(parsed satisfies JsonWebKey).toBeTruthy();
   });
 });
 
