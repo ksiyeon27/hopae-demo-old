@@ -20,9 +20,14 @@ export class IssuerController {
   async makeEmployee(@Body() employeeData: EmployeeData) {
     await this.issuerService.makeEmployee(employeeData);
   }
-  @Get('/vc/career/:id')
-  async findCareerVc(@Param('id') vcDid: string): Promise<boolean> {
-    return this.issuerService.findCareerVc(vcDid);
+
+  @Post('/nonce/career')
+  requestNonceForCareer(
+    @Body() requestNonceFromIssuerDTO: RequestNonceFromIssuerDTO,
+  ): number {
+    return this.issuerService.requestNonceForCareer(
+      requestNonceFromIssuerDTO.holderDid,
+    );
   }
 
   @Post('/vc/career')
@@ -32,13 +37,9 @@ export class IssuerController {
     return await this.issuerService.requestCareerVc(careerVcRequestData);
   }
 
-  @Post('/nonce/career')
-  requestNonceForCareer(
-    @Body() requestNonceFromIssuerDTO: RequestNonceFromIssuerDTO,
-  ): number {
-    return this.issuerService.requestNonceForCareer(
-      requestNonceFromIssuerDTO.holderDid,
-    );
+  @Get('/vc/career/:id')
+  async findCareerVc(@Param('id') vcDid: string): Promise<boolean> {
+    return this.issuerService.findCareerVc(vcDid);
   }
 
   // genetic-test
@@ -52,9 +53,14 @@ export class IssuerController {
   async makeGeneticTestResult(@Body() employeeData: EmployeeData) {
     await this.issuerService.makeEmployee(employeeData);
   }
-  @Get('/vc/genetic-test/:id')
-  async findGeneticTestVc(@Param('id') vcDid: string): Promise<boolean> {
-    return this.issuerService.findCareerVc(vcDid);
+
+  @Post('/nonce/genetic-test')
+  requestNonceForGeneticTest(
+    @Body() requestNonceFromIssuerDTO: RequestNonceFromIssuerDTO,
+  ): number {
+    return this.issuerService.requestNonceForGeneticTest(
+      requestNonceFromIssuerDTO.holderDid,
+    );
   }
 
   @Post('/vc/genetic-test')
@@ -64,12 +70,8 @@ export class IssuerController {
     return await this.issuerService.requestCareerVc(careerVcRequestData);
   }
 
-  @Post('/nonce/genetic-test')
-  requestNonceForGeneticTest(
-    @Body() requestNonceFromIssuerDTO: RequestNonceFromIssuerDTO,
-  ): number {
-    return this.issuerService.requestNonceForGeneticTest(
-      requestNonceFromIssuerDTO.holderDid,
-    );
+  @Get('/vc/genetic-test/:id')
+  async findGeneticTestVc(@Param('id') vcDid: string): Promise<boolean> {
+    return this.issuerService.findCareerVc(vcDid);
   }
 }
