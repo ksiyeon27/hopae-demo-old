@@ -10,6 +10,9 @@ import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity
 import { CareerIssuerEmployeeNonceService } from 'src/career_issuer_employee_nonce/career_issuer_employee_nonce.service';
 import { CareerIssuerCertificateService } from 'src/career_issuer_certificate/career_issuer_certificate.service';
 import { EmployeeData } from './dto/employee-data.dto';
+import { GeneticTestIssuerTesterNonceService } from 'src/genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.service';
+import { GeneticTestResultData } from './dto/genetic-test-result-data.dto';
+import { GeneticTestIssuerResultService } from 'src/genetic_test_issuer_result/genetic_test_issuer_result.service';
 
 @Injectable()
 export class IssuerService {
@@ -17,18 +20,20 @@ export class IssuerService {
     readonly jwtService: JwtService,
     readonly didResolverService: DidResolverService,
     readonly careerIssuerEmployeeService: CareerIssuerEmployeeService,
+    readonly geneticTestIssuerResultService: GeneticTestIssuerResultService,
     readonly careerIssuerEmployeeNonceService: CareerIssuerEmployeeNonceService,
+    readonly geneticTestIssuerTesterNonceService: GeneticTestIssuerTesterNonceService,
     readonly careerIssuerCertificateService: CareerIssuerCertificateService,
   ) {}
 
-  async makePlayers(playersDidData: PlayersDidData) {
-    console.log(
-      `==issuerService: makePlayers ${playersDidData.holderDid}, ${playersDidData.issuerDid}`,
-    );
-    await this.jwtService.createPlayer(playersDidData.holderDid, 'holder');
-    await this.jwtService.createPlayer(playersDidData.issuerDid, 'issuer');
-    await this.jwtService.getHolderByDid(playersDidData.holderDid);
-    await this.jwtService.getIssuer();
+  async makeIssuer(issuerDid: string, type: string) {
+    console.log(`==issuerService: makeIssuer ${issuerDid} for ${type}`);
+    await this.jwtService.createIssuer(issuerDid, type);
+  }
+
+  async makeHolder(holderDid: string) {
+    console.log(`==issuerService: makeHolder ${holderDid}`);
+    await this.jwtService.createHolder(holderDid);
   }
 
   async makeEmployee(employeeData: EmployeeData) {
@@ -40,6 +45,19 @@ export class IssuerService {
       employeeData.salary,
       new Date(employeeData.join),
       new Date(employeeData.leave),
+    );
+  }
+
+  async makeGeneticTestResult(geneticTestResultData: GeneticTestResultData) {
+    console.log(`==issuerService: makeGeneticTestResult`);
+    await this.geneticTestIssuerResultService.create(
+      geneticTestResultData.did,
+      geneticTestResultData.hairLossGeneHeritability,
+      geneticTestResultData.dermatitisGeneHeritability,
+      geneticTestResultData.stomachCancerRisk,
+      geneticTestResultData.lungsCancerRisk,
+      geneticTestResultData.liverCancerRisk,
+      geneticTestResultData.pancreasCancerRisk,
     );
   }
 
@@ -56,11 +74,22 @@ export class IssuerService {
   }
 
   requestNonceForCareer(holderDid: string): number {
+    console.log('==issuerService: requestNonceForCareer==');
     // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
     const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
 
     // career_issuer_employee_nonce 테이블에 저장하기
     this.careerIssuerEmployeeNonceService.create(holderDid, nonce);
+    return nonce;
+  }
+
+  requestNonceForGeneticTest(holderDid: string): number {
+    console.log('==issuerService: requestNonceForGeneticTest==');
+    // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
+    const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
+
+    // genetic_test_issuer_tester_nonce 테이블에 저장하기
+    this.geneticTestIssuerTesterNonceService.create(holderDid, nonce);
     return nonce;
   }
 

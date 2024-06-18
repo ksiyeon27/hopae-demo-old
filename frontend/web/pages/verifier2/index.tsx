@@ -1,17 +1,19 @@
 import { Box, Button } from "@mui/material";
-import { v4 } from "uuid";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
+import { backendHostingURL } from "@/common/config";
+import Component from "./component";
+import Layout from "./layout";
 
 const Verifier2Page: FC = () => {
   const useDeepLink = () => {
-    const url = "https://dummy.com"; // verifier 2 backend
-    const uuid = v4();
+    const url = backendHostingURL + "/verifier/vp/career"; // verifier 2 backend
+    const nonceUrl = backendHostingURL + "/verifier/nonce/career"; // 대신 서버에서 가져와야함
     const fields = ["name", "age"];
     window.open(
       "wwwallet://verify?url=" +
         url +
-        "&randomString=" +
-        uuid +
+        "&nonceUrl=" +
+        nonceUrl +
         "&fields=" +
         fields.join(",")
     );
@@ -24,38 +26,11 @@ const Verifier2Page: FC = () => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flex: 1,
-        justifyContent: "start",
-        alignItems: "center",
-        flexDirection: "column",
-        width: "100vw",
-        height: "100vh",
-        overflow: "auto",
-        backgroundImage: 'url("/verifier2.jpg")',
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: "white",
-          padding: "16px",
-          alignSelf: "center",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Box sx={{ fontSize: 28 }}>Verifier 2 Main Page</Box>
-        <Box sx={{ flex: 1 }}>
-          <Button onClick={useDeepLink}>{"앱으로 인증하기"}</Button>
-        </Box>
+    <Layout>
+      <Box>
+        <Component />
       </Box>
-    </Box>
+    </Layout>
   );
 };
 

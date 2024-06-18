@@ -10,36 +10,34 @@ import {
   View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { extractData, makeVP } from '@/utils/jwt';
+import { dummyEncrypt, extractData, makeVP } from '@/utils/jwt';
+import axios from 'axios';
+import { holderDid } from '@/common/const';
 
 type VerifyScreenProps = NativeStackScreenProps<RootStackParamList, 'Verify'>;
 const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [url, setUrl] = useState<string>('');
-  const [randomString, setRandomString] = useState<string>('');
+  const [nonceUrl, setNonceUrl] = useState<string>('');
   const [fields, setFields] = useState<string[]>([]);
   const [flag, setFlag] = useState<boolean | null>(null);
   const vw = Dimensions.get('window').width;
 
   useEffect(() => {
-    if (
-      !route.params.url ||
-      !route.params.randomString ||
-      !route.params.fields
-    ) {
+    if (!route.params.url || !route.params.nonceUrl || !route.params.fields) {
       Alert.alert('비정상적인 접근입니다');
       navigation.goBack();
       return;
     }
     setUrl(route.params.url);
-    setRandomString(route.params.randomString);
+    setNonceUrl(route.params.nonceUrl);
     setFields(route.params.fields.split(','));
     setOpen(true);
   }, [route.params]);
 
   useEffect(() => {
     if (!flag) return;
-    const applyVP = async () => {
+    const _inner = async () => {
       const creds = await AsyncStorage.getItem('credentials');
       if (!creds) {
         Alert.alert(
@@ -92,8 +90,20 @@ const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
         );
         return;
       }
-      const vp = makeVP(filteredResults[0]!.rawString, fields, randomString);
-      // axios.post(route.params.url, vp).then((res) => {});
+      const nonceRes = await axios.post(route.params.nonceUrl, {
+        holderDid: holderDid,
+      });
+      console.log('get nonce: ', nonceRes.data);
+      const vp = await makeVP(
+        filteredResults[0]!.rawString,
+        fields,
+        dummyEncrypt(nonceRes.data), // 암호화? raw?
+      );
+      console.log('vp created: ', vp);
+      await axios.post(route.params.url, {
+        vp: vp,
+        holderDid: holderDid,
+      });
       Alert.alert(
         '인증이 완료되었습니다',
         '',
@@ -113,7 +123,7 @@ const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
         },
       );
     };
-    applyVP().catch((e) => {
+    _inner().catch((e) => {
       console.error(e);
       Alert.alert(
         '인증에 실패했습니다',

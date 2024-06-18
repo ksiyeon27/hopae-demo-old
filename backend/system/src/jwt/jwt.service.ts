@@ -10,12 +10,15 @@ import { CareerIssuerMe } from 'src/entities/career_issuer_me.entity';
 import { TestHolderService } from 'src/test_holder/test_holder.service';
 import { TestHolder } from 'src/entities/test_holder.entity';
 import { CareerVerifierApplicantNonceService } from 'src/career_verifier_applicant_nonce/career_verifier_applicant_nonce.service';
+import { GeneticTestIssuerMeService } from 'src/genetic_test_issuer_me/genetic_test_issuer_me.service';
+import { GeneticTestIssuerMe } from 'src/entities/genetic_test_issuer_me.entity';
 
 @Injectable()
 export class JwtService {
   constructor(
     readonly didResolverService: DidResolverService,
     readonly careerIssuerMeService: CareerIssuerMeService,
+    readonly geneticTestIssuerMeService: GeneticTestIssuerMeService,
     readonly testHolderService: TestHolderService,
     readonly careerVerifierApplicantNonceService: CareerVerifierApplicantNonceService,
   ) {}
@@ -47,8 +50,46 @@ export class JwtService {
     }
   }
 
-  async getIssuer(): Promise<CareerIssuerMe> {
+  async createHolder(holderDid: string) {
+    const { privateKey, publicKey } = await ES256.generateKeyPair();
+    // test_holder entity 생성
+    const publicKeyString = JSON.stringify(publicKey);
+    const privateKeyString = JSON.stringify(privateKey);
+
+    this.testHolderService.create(holderDid, publicKeyString, privateKeyString);
+    this.getHolderByDid(holderDid);
+  }
+
+  async createIssuer(issuerDid: string, type: string) {
+    const { privateKey, publicKey } = await ES256.generateKeyPair();
+    // {type}_issuer_me entity 생성
+    const publicKeyString = JSON.stringify(publicKey);
+    const privateKeyString = JSON.stringify(privateKey);
+    if (type === 'career') {
+      this.careerIssuerMeService.create(
+        issuerDid,
+        publicKeyString,
+        privateKeyString,
+        'career_issuer',
+      );
+      await this.getCareerIssuer();
+    } else if (type === 'genetic-test') {
+      this.geneticTestIssuerMeService.create(
+        issuerDid,
+        publicKeyString,
+        privateKeyString,
+        'dtc_genetic_test_agency',
+      );
+      await this.getGeneticTestIssuer();
+    }
+  }
+
+  async getCareerIssuer(): Promise<CareerIssuerMe> {
     return await this.careerIssuerMeService.findMe();
+  }
+
+  async getGeneticTestIssuer(): Promise<GeneticTestIssuerMe> {
+    return await this.geneticTestIssuerMeService.findMe();
   }
 
   async getHolderByDid(did: string): Promise<TestHolder> {
@@ -69,7 +110,7 @@ export class JwtService {
     holderDid: string,
   ): Promise<string> {
     console.log('==jwtService: createVcJwt==');
-    const issuer = await this.getIssuer();
+    const issuer = await this.getCareerIssuer();
 
     // console.log(issuer);
     const issuerSigner = await this.createSigner(issuer.privateKey);
@@ -208,7 +249,7 @@ export class JwtService {
 
     //5. instance.verify() 하기
     // 테스트용
-    const issuer = await this.getIssuer();
+    const issuer = await this.getCareerIssuer();
     const holder = await this.getHolderByDid(holderDid);
     issuerPublicKey = issuer.publicKey;
     holderPublicKey = holder.publicKey;
