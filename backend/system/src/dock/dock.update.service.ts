@@ -2,21 +2,9 @@ import { Injectable } from '@nestjs/common';
 import dock from '@docknetwork/sdk';
 import { DidKeypair } from '@docknetwork/sdk/utils/did';
 import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
-import { ES256 } from '@sd-jwt/crypto-nodejs';
-import * as crypto from 'crypto';
-import { MockPublicKey } from './mock_public_key';
+
 @Injectable()
 export class DockUpdateService {
-  async testHash() {
-    const { privateKey, publicKey } = await ES256.generateKeyPair();
-    console.log(publicKey.x);
-    console.log(publicKey.x.length);
-    console.log(publicKey.y);
-    console.log(publicKey.y.length);
-    console.log(privateKey.y.length);
-    return 'Test';
-  }
-
   async addKey({ did, secretUri }: { did: string; secretUri: string }) {
     console.log('function --- addKey');
     console.log('did:', did);
