@@ -1,11 +1,7 @@
-:root {
-  --radius: 0.5rem;
-}
-
 body {
-  font-family: var(--font-chivo), sans-serif;
+  font-family: var(--font-dm_serif_display), serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-libre_franklin), sans-serif;
+  font-family: var(--font-yeseva_one), serif;
 }
