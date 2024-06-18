@@ -13,7 +13,6 @@ export class DockDidUtilService {
     for (let i = 0; i < stringifiedJwk.length; i += chunkSize) {
       const chunk = stringifiedJwk.slice(i, i + chunkSize);
       const chunkToPush = chunk.padEnd(chunkSize, ' ');
-      console.log('chunkToPush:', `[ ${chunkToPush} ]`);
       chunks.push(chunkToPush);
     }
     return chunks.map((chunk) => {
