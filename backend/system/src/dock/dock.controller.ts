@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DockService } from './dock.service';
 import { DockUpdateService } from './dock.update.service';
-import { UtilService } from './util_service/util.service';
+import { DockDidUtilService } from './util_service/util.service';
 import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 @Controller('dock')
@@ -9,7 +9,7 @@ export class DockController {
   constructor(
     private dockService: DockService,
     private dockUpdateService: DockUpdateService,
-    private utilService: UtilService,
+    private dockDidUtilService: DockDidUtilService,
   ) {}
 
   // 기본적인 dock resolver 역할을 수행한다.
@@ -37,7 +37,7 @@ export class DockController {
     if (result === undefined) {
       return '해당 did에 대한 정보가 없습니다.';
     }
-    const jwk = this.utilService.aggregateBase58KeysToJwk(
+    const jwk = this.dockDidUtilService.aggregateBase58KeysToJwk(
       result.publicKey.map((e) => e.publicKeyBase58),
     );
     return jwk;
@@ -95,7 +95,7 @@ export class DockController {
       }
       console.log('jwkToUse - pulic key :', jwkToUse);
       const did = this.dockService.createRandomDid();
-      const didKeys = this.utilService.publicJwkToDidKeys(jwkToUse);
+      const didKeys = this.dockDidUtilService.publicJwkToDidKeys(jwkToUse);
       await this.dockService.registerDidWithDidKeys(didKeys, did);
       return {
         msg: 'success',

@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DockService } from './dock.service';
 import exp from 'constants';
-import { UtilService } from './util_service/util.service';
+import { DockDidUtilService } from './util_service/util.service';
 import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 describe('DockService', () => {
   let service: DockService;
-  let utilService: UtilService;
+  let utilService: DockDidUtilService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DockService, UtilService],
+      providers: [DockService, DockDidUtilService],
     }).compile();
 
     service = module.get<DockService>(DockService);
-    utilService = module.get<UtilService>(UtilService);
+    utilService = module.get<DockDidUtilService>(DockDidUtilService);
   });
 
   it('should be defined - random did', () => {

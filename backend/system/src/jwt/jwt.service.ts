@@ -84,6 +84,10 @@ export class JwtService {
     }
   }
 
+  async generateJwkPair() {
+    return await ES256.generateKeyPair();
+  }
+
   async getCareerIssuer(): Promise<CareerIssuerMe> {
     return await this.careerIssuerMeService.findMe();
   }

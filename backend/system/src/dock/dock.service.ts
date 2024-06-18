@@ -9,7 +9,7 @@ import { PublicKeyEd25519, PublicKeySr25519 } from '@docknetwork/sdk';
 import * as crypto from 'crypto';
 import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
 import { MockPublicKey } from './mock_public_key';
-import { UtilService } from './util_service/util.service';
+import { DockDidUtilService } from './util_service/util.service';
 import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 // pre defined random bytes as hex
@@ -22,7 +22,7 @@ import { ES256 } from '@sd-jwt/crypto-nodejs';
 
 @Injectable()
 export class DockService {
-  constructor(readonly utilService: UtilService) {}
+  constructor(readonly dockDidUtilService: DockDidUtilService) {}
 
   secretUriForIssuer1 = '//Issuer1';
   secretUriForIssuer2 = '//Issuer2';

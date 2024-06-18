@@ -4,7 +4,7 @@ import { DidKey, VerificationRelationship } from '@docknetwork/sdk/public-keys';
 import { MockPublicKey } from '../mock_public_key';
 import * as bs58 from 'bs58';
 @Injectable()
-export class UtilService {
+export class DockDidUtilService {
   publicJwkToDidKeys(jwk: crypto.webcrypto.JsonWebKey): DidKey[] {
     const stringifiedJwk = JSON.stringify(jwk);
     // 32자 단위로 나누기
