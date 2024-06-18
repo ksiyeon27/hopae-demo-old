@@ -1,22 +1,24 @@
-import { Libre_Franklin } from 'next/font/google';
-import { Chivo } from 'next/font/google';
-// import './styles.css';
+import { Yeseva_One } from 'next/font/google'
+import { DM_Serif_Display } from 'next/font/google'
+// import './styles.css'
 
-const libre_franklin = Libre_Franklin({
+const yeseva_one = Yeseva_One({
+  weight: '400',
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-libre_franklin',
+  variable: '--font-yeseva_one',
 })
-const chivo = Chivo({
+const dm_serif_display = DM_Serif_Display({
+  weight: '400',
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-chivo',
+  variable: '--font-dm_serif_display',
 })
 
 export default function Layout({ children }) {
   return (
     <html lang="en">
-      <body className={libre_franklin.variable + ' ' + chivo.variable}>
+      <body className={yeseva_one.variable + ' ' + dm_serif_display.variable}>
         {children}
       </body>
     </html>
