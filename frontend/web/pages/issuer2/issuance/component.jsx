@@ -1,12 +1,17 @@
 import Link from "next/link";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { backendHostingURL } from "@/common/config";
 
 export default function Component() {
   const useDeepLink = () => {
-    const url = backendHostingURL + "/issuer/vc/career"; // issuer 1 backend
-    const nonceUrl = backendHostingURL + "/issuer/nonce/career"; // 대신 서버에서 가져와야함
+    const url = backendHostingURL + "/issuer/vc/genetic-test"; // issuer 2 backend
+    const nonceUrl = backendHostingURL + "/issuer/nonce/genetic-test"; // 대신 서버에서 가져와야함
     window.open("wwwallet://issue?url=" + url + "&nonceUrl=" + nonceUrl);
   };
 
@@ -77,7 +82,9 @@ export default function Component() {
       </main>
       <footer className="bg-gray-100 dark:bg-gray-800 py-6">
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
-          <p className="text-sm text-gray-500 dark:text-gray-400">&copy; 2024 Genoma Insights. All rights reserved.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            &copy; 2024 Genoma Insights. All rights reserved.
+          </p>
           <nav className="flex items-center space-x-4">
             <Link
               href="#"
@@ -104,7 +111,7 @@ export default function Component() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
 function DnaIcon(props) {
@@ -133,9 +140,8 @@ function DnaIcon(props) {
       <path d="m16.5 10.5 1 1" />
       <path d="m10 16 1.5 1.5" />
     </svg>
-  )
+  );
 }
-
 
 function MenuIcon(props) {
   return (
@@ -155,5 +161,5 @@ function MenuIcon(props) {
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
-  )
+  );
 }

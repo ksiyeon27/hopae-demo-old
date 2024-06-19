@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { backendHostingURL } from "@/common/config";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 export default function Component() {
   const useDeepLink = () => {
-    const url = backendHostingURL + "/verifier/vp/career"; // verifier 2 backend
-    const nonceUrl = backendHostingURL + "/verifier/nonce/career"; // 대신 서버에서 가져와야함
+    const url = backendHostingURL + "/verifier/vp/genetic-test"; // verifier 2 backend
+    const nonceUrl = backendHostingURL + "/verifier/nonce/genetic-test"; // 대신 서버에서 가져와야함
     const fields = ["name", "age"];
     window.open(
       "wwwallet://verify?url=" +
@@ -91,12 +96,20 @@ export default function Component() {
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="relative h-[400px] md:h-[500px] lg:h-[600px] order-2 md:order-1">
-                <img src="/verifier2.jpg" alt="Genetic Information" fill className="object-cover rounded-lg" />
+                <img
+                  src="/verifier2.jpg"
+                  alt="Genetic Information"
+                  fill
+                  className="object-cover rounded-lg"
+                />
               </div>
               <div className="text-center md:text-left order-1 md:order-2">
-                <h1 className="text-4xl font-bold mb-4 md:text-5xl lg:text-6xl">Genetic Information</h1>
+                <h1 className="text-4xl font-bold mb-4 md:text-5xl lg:text-6xl">
+                  Genetic Information
+                </h1>
                 <p className="text-gray-600 mb-8 md:text-lg lg:text-xl">
-                  Submit your genetic information to help us provide the best marriage recommendations.
+                  Submit your genetic information to help us provide the best
+                  marriage recommendations.
                 </p>
                 <Link
                   onClick={useDeepLink}
@@ -112,10 +125,12 @@ export default function Component() {
         </section>
       </main>
       <footer className="bg-gray-900 text-white py-6 md:py-8 lg:py-10">
-        <div className="container mx-auto text-center">&copy; 2023 Marriage Info. All rights reserved.</div>
+        <div className="container mx-auto text-center">
+          &copy; 2023 Marriage Info. All rights reserved.
+        </div>
       </footer>
     </div>
-  )
+  );
 }
 
 function MenuIcon(props) {
@@ -136,5 +151,5 @@ function MenuIcon(props) {
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
-  )
+  );
 }

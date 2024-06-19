@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { dummyEncrypt, extractData, makeVP } from '@/utils/jwt';
+import { extractData, makeVP } from '@/utils/jwt';
 import axios from 'axios';
 import { holderDid } from '@/common/const';
 
@@ -90,17 +90,17 @@ const VerifyScreen: FC<VerifyScreenProps> = ({ navigation, route }) => {
         );
         return;
       }
-      const nonceRes = await axios.post(route.params.nonceUrl, {
+      const nonceRes = await axios.post(nonceUrl, {
         holderDid: holderDid,
       });
       console.log('get nonce: ', nonceRes.data);
       const vp = await makeVP(
         filteredResults[0]!.rawString,
         fields,
-        dummyEncrypt(nonceRes.data), // 암호화? raw?
+        nonceRes.data,
       );
       console.log('vp created: ', vp);
-      await axios.post(route.params.url, {
+      await axios.post(url, {
         vp: vp,
         holderDid: holderDid,
       });

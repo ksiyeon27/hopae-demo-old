@@ -74,7 +74,7 @@ export const makeVP = async (vc: string, fields: string[], nonce: string) => {
   const kbPayload = {
     iat: new Date().getTime(),
     aud: 'VP 받는 사람',
-    nonce: nonce,
+    nonce: await encrypt(nonce),
   };
 
   return vpInstance.present(vc, presentationFrame, {

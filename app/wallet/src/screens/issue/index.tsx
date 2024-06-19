@@ -3,11 +3,9 @@ import { RootStackParamList } from '@/navigation/types';
 import React, { FC, useEffect } from 'react';
 import { Alert, Dimensions, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { dummyEncrypt, encrypt, extractData } from '@/utils/jwt';
+import { encrypt, extractData } from '@/utils/jwt';
 import axios from 'axios';
 import { holderDid } from '@/common/const';
-
-const dummyNonce = 'nonce1';
 
 type IssueScreenProps = NativeStackScreenProps<RootStackParamList, 'Issue'>;
 const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
@@ -76,7 +74,7 @@ const IssueScreen: FC<IssueScreenProps> = ({ navigation, route }) => {
       });
       const res = await axios.post(route.params.url, {
         holderDid: holderDid,
-        encryptedNonce: dummyEncrypt(nonceRes.data),
+        encryptedNonce: await encrypt(nonceRes.data),
       });
       await saveVC(res.data);
       Alert.alert('인증서 발급 완료', '인증서 발급이 완료되었습니다.');
