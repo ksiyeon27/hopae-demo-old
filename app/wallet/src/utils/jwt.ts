@@ -24,9 +24,8 @@ export const dummyEncrypt = (data: string) => {
 
 // Function to encrypt a string
 export const encrypt = async (data: string) => {
-  return dummyEncrypt(data);
-  // const signer = getSigner(holderPrivateKey);
-  // return await signer(data);
+  const signer = getSigner(holderPrivateKey);
+  return await signer(data);
 };
 
 export const extractData = async (
