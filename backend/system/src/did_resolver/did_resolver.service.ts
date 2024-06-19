@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DockService } from 'src/dock/dock.service';
 import { DockDidUtilService } from 'src/dock/util_service/util.service';
 
@@ -8,13 +8,13 @@ export class DidResolverService {
     throw new Error('Method not implemented.');
   }
 
-  getPulbicKeyByDid(did: string): Promise<any> {
+  getPublicKeyByDid(did: string): Promise<JsonWebKey | undefined> {
     throw new Error('Method not implemented.');
   }
 }
 
 export class DidResolverServiceWebImpl implements DidResolverService {
-  async getPulbicKeyByDid(did: string): Promise<string> {
+  async getPublicKeyByDid(did: string): Promise<JsonWebKey | undefined> {
     const didDoc = await this.getDidDoc(did);
     if (!didDoc) {
       return undefined;
@@ -22,7 +22,7 @@ export class DidResolverServiceWebImpl implements DidResolverService {
     const verificationMethods = didDoc.verificationMethod;
     // 걍 첫번째꺼 가져오자
     const publicKeyJwk = verificationMethods[0].publicKeyJwk;
-    return publicKeyJwk;
+    return publicKeyJwk as JsonWebKey;
   }
   async getDidDoc(did: string) {
     console.log(`==DidResolverService: getDidDoc ${did} ==`);
@@ -44,15 +44,15 @@ export class DidResolverServiceDockImpl implements DidResolverService {
     readonly dockService: DockService,
     readonly dockDidUtilService: DockDidUtilService,
   ) {}
-  async getPulbicKeyByDid(did: string): Promise<any> {
+  async getPublicKeyByDid(did: string) {
     const didDoc = await this.getDidDoc(did);
     const publicKeysOfDoc = didDoc.publicKey;
     const base58EncodedKeys = publicKeysOfDoc.map(
       (key: any) => key.publicKeyBase58,
     );
-    const pulblicJwk =
+    const publicJwk =
       this.dockDidUtilService.aggregateBase58KeysToJwk(base58EncodedKeys);
-    return pulblicJwk;
+    return publicJwk;
   }
   async getDidDoc(did: string): Promise<Record<string, any>> {
     await this.dockService.connectToNode();

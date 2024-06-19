@@ -15,12 +15,7 @@ const didResolverService = {
     dockService: DockService,
     dockDidUtilService: DockDidUtilService,
   ) => {
-    console.log('use factory -------------');
-    console.log(process.env.DOCK);
-    console.log(process.env.DOCK === 'true');
-    return process.env.DOCK === 'true'
-      ? new DidResolverServiceDockImpl(dockService, dockDidUtilService)
-      : new DidResolverServiceWebImpl();
+    return new DidResolverServiceDockImpl(dockService, dockDidUtilService);
   },
   inject: [DockService, DockDidUtilService],
 };

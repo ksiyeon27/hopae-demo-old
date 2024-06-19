@@ -1,7 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { VerifyVpDTO } from './dto/verify-career-vp.dto';
 import { JwtService } from 'src/jwt/jwt.service';
-import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerVerifierApplicantNonceService } from 'src/career_verifier_applicant_nonce/career_verifier_applicant_nonce.service';
 import { GeneticTestVerifierMemberNonceService } from 'src/genetic_test_verifier_member_nonce/genetic_test_verifier_member_nonce.service';
 
@@ -9,7 +8,6 @@ import { GeneticTestVerifierMemberNonceService } from 'src/genetic_test_verifier
 export class VerifierService {
   constructor(
     readonly jwtService: JwtService,
-    readonly didResolverService: DidResolverService,
     readonly careerVerifierApplicantNonceService: CareerVerifierApplicantNonceService,
     readonly geneticTestVerifierApplicantNonceService: GeneticTestVerifierMemberNonceService,
   ) {}
@@ -60,12 +58,6 @@ export class VerifierService {
     }
     console.log(`!! 2번 검증 완료 (issuer 디비에서 vcId 찾기 : ${vcId})`);
 
-    // 3. Did resolver 로 vcId 찾아와서 만료되었는지 확인
-    const vcDidDoc = await this.didResolverService.getDidDoc(vcId);
-    console.log(`!! 3번 검증 완료 (vcId 로 Did Resolver 가 찾기 : ${vcId})`);
-    // 만료기간 확인하는 코드 추가 필요
-    console.log(vcDidDoc);
-
     return true;
   }
 
@@ -99,12 +91,6 @@ export class VerifierService {
       throw new HttpException('VC 가 issuer 의 DB 에서 조회되지 않음', 400);
     }
     console.log(`!! 2번 검증 완료 (issuer 디비에서 vcId 찾기 : ${vcId})`);
-
-    // 3. Did resolver 로 vcId 찾아와서 만료되었는지 확인
-    const vcDidDoc = await this.didResolverService.getDidDoc(vcId);
-    console.log(`!! 3번 검증 완료 (vcId 로 Did Resolver 가 찾기 : ${vcId})`);
-    // 만료기간 확인하는 코드 추가 필요
-    console.log(vcDidDoc);
 
     return true;
   }
