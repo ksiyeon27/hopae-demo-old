@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Body, Param } from '@nestjs/common';
 import { IssuerService } from './issuer.service';
-import { RequestCareerVcDTO } from './dto/request-career-vc.dto';
+import { RequestVcDTO } from './dto/request-career-vc.dto';
 import { PlayersDidData } from './dto/players-did-data.dto';
 import { RequestNonceFromIssuerDTO } from './dto/request-nonce-for-career.dto';
 import { EmployeeData } from './dto/employee-data.dto';
@@ -32,10 +32,8 @@ export class IssuerController {
   }
 
   @Post('/vc/career')
-  async requestCareerVc(
-    @Body() careerVcRequestData: RequestCareerVcDTO,
-  ): Promise<string> {
-    return await this.issuerService.requestCareerVc(careerVcRequestData);
+  async requestCareerVc(@Body() vcRequestData: RequestVcDTO): Promise<string> {
+    return await this.issuerService.requestCareerVc(vcRequestData);
   }
 
   @Get('/vc/career/:id')
@@ -68,9 +66,9 @@ export class IssuerController {
 
   @Post('/vc/genetic-test')
   async requestGeneticTestVc(
-    @Body() careerVcRequestData: RequestCareerVcDTO,
+    @Body() vcRequestData: RequestVcDTO,
   ): Promise<string> {
-    return await this.issuerService.requestCareerVc(careerVcRequestData);
+    return await this.issuerService.requestGeneticTestVc(vcRequestData);
   }
 
   @Get('/vc/genetic-test/:id')

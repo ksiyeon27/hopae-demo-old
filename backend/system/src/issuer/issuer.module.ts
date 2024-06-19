@@ -8,6 +8,7 @@ import { CareerIssuerEmployeeNonceModule } from 'src/career_issuer_employee_nonc
 import { CareerIssuerCertificateModule } from 'src/career_issuer_certificate/career_issuer_certificate.module';
 import { GeneticTestIssuerTesterNonceModule } from 'src/genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.module';
 import { GeneticTestIssuerResultModule } from 'src/genetic_test_issuer_result/genetic_test_issuer_result.module';
+import { GeneticTestIssuerCertificateModule } from 'src/genetic_test_issuer_certificate/genetic_test_issuer_certificate.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GeneticTestIssuerResultModule } from 'src/genetic_test_issuer_result/ge
     CareerIssuerEmployeeNonceModule,
     CareerIssuerCertificateModule,
     GeneticTestIssuerTesterNonceModule,
+    GeneticTestIssuerCertificateModule,
   ],
   controllers: [IssuerController],
   providers: [IssuerService],

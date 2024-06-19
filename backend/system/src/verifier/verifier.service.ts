@@ -29,7 +29,7 @@ export class VerifierService {
     // 1. VP 를 sd-jwt 로 verify (kbJwt 시그니처 검증+난수 검증으로 홀더 검증, jwt 시그니처 검증으로 이슈어 검증)
     let verified = null;
     try {
-      verified = await this.jwtService.verifyVpJwt(
+      verified = await this.jwtService.verifyCareerVpJwt(
         careerVpVerifyData.holderDid,
         careerVpVerifyData.vp,
       );
