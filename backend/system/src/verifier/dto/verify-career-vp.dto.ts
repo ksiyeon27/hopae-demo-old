@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class VerifyCareerVpDTO {
+export class VerifyVpDTO {
   @IsString()
   readonly holderDid: string;
   @IsString()

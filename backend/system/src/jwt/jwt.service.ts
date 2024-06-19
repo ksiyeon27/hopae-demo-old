@@ -12,6 +12,7 @@ import { TestHolder } from 'src/entities/test_holder.entity';
 import { CareerVerifierApplicantNonceService } from 'src/career_verifier_applicant_nonce/career_verifier_applicant_nonce.service';
 import { GeneticTestIssuerMeService } from 'src/genetic_test_issuer_me/genetic_test_issuer_me.service';
 import { GeneticTestIssuerMe } from 'src/entities/genetic_test_issuer_me.entity';
+import { GeneticTestVerifierMemberNonceService } from 'src/genetic_test_verifier_member_nonce/genetic_test_verifier_member_nonce.service';
 
 @Injectable()
 export class JwtService {
@@ -21,6 +22,7 @@ export class JwtService {
     readonly geneticTestIssuerMeService: GeneticTestIssuerMeService,
     readonly testHolderService: TestHolderService,
     readonly careerVerifierApplicantNonceService: CareerVerifierApplicantNonceService,
+    readonly geneticTestVerifierMemberNonceService: GeneticTestVerifierMemberNonceService,
   ) {}
 
   async createPlayer(playerId: string, type: string) {
@@ -332,7 +334,7 @@ export class JwtService {
       //VP 에 추가되는 Payload
       iat: new Date().getTime(), //VP 만든 시각
       aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
-      nonce: '1649983664mock', // 암호화한 난수 - /verifier/nonce/genetic-test 응답 + Mock
+      nonce: '1878741778mock', // 암호화한 난수 - /verifier/nonce/genetic-test 응답 + Mock
     };
 
     //SDJWTException: Key Binding Signer not found
@@ -406,7 +408,7 @@ export class JwtService {
 
     const publicKey = didDoc.publicKey ?? 'mock';
     const applicant_nonce_entity =
-      await this.careerVerifierApplicantNonceService.findOneByDid(holderDid);
+      await this.geneticTestVerifierMemberNonceService.findOneByDid(holderDid);
 
     const verifyResult = this._verifyNonceUsingPublicKey(
       publicKey,
@@ -422,7 +424,7 @@ export class JwtService {
 
     //5. instance.verify() 하기
     // 테스트용
-    const issuer = await this.getCareerIssuer();
+    const issuer = await this.getGeneticTestIssuer();
     const holder = await this.getHolderByDid(holderDid);
     issuerPublicKey = issuer.publicKey;
     holderPublicKey = holder.publicKey;
@@ -440,7 +442,11 @@ export class JwtService {
     });
 
     // console.log('\nverify\n');
-    const verified = await verifierInstance.verify(vp, ['department'], true);
+    const verified = await verifierInstance.verify(
+      vp,
+      ['dermatitis_gene_heritability'],
+      true,
+    );
     console.log(
       ` 5) SDJwtVcInstance.verify() : issuer ${issuer.did}, holder ${holder.did} 이용`,
     );

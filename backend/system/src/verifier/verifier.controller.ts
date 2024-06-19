@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { VerifyCareerVpDTO } from './dto/verify-career-vp.dto';
+import { VerifyVpDTO } from './dto/verify-career-vp.dto';
 import { VerifierService } from './verifier.service';
 import { RequestNonceFromVerifierDTO } from './dto/request-nonce-from-verifier';
 
@@ -10,7 +10,7 @@ export class VerifierController {
   // career
   @Post('/vp/career')
   async verifyCareerVp(
-    @Body() careerVpVerifyData: VerifyCareerVpDTO,
+    @Body() careerVpVerifyData: VerifyVpDTO,
   ): Promise<boolean> {
     return await this.verifierService.verifyCareerVp(careerVpVerifyData);
   }
@@ -27,9 +27,9 @@ export class VerifierController {
   // genetic-test
   @Post('/vp/genetic-test')
   async verifyGeneticTestVp(
-    @Body() careerVpVerifyData: VerifyCareerVpDTO,
+    @Body() careerVpVerifyData: VerifyVpDTO,
   ): Promise<boolean> {
-    return await this.verifierService.verifyCareerVp(careerVpVerifyData);
+    return await this.verifierService.verifyGeneticTestVp(careerVpVerifyData);
   }
 
   @Post('/nonce/genetic-test')
