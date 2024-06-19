@@ -115,12 +115,9 @@ export class IssuerService {
     console.log('==issuerService: requestCareerVc==');
 
     // 1. 홀더 검증 : DID resolver API 호출해서 did docs 얻어오고, 난수 복호화 시도
-    const didDoc = await this.didResolverService.getDidDoc(
+    const publicKey = await this.didResolverService.getPublicKeyByDid(
       careerVcRequestData.holderDid,
     );
-
-    // 실제로는 public key 담겨있는 공간이 약간 다른데 대충 일단은 여기 있다고 가정하자
-    const publicKey = didDoc.publicKey ?? 'mock';
     const employee_nonce_entity =
       await this.careerIssuerEmployeeNonceService.findOneByDid(
         careerVcRequestData.holderDid,
@@ -149,15 +146,15 @@ export class IssuerService {
     // 2. VC 생성
     const vcClaims = this._createCareerVcClaims(employee);
 
-    const newVcDid = 'new_vc_id'; // POST /did/{did}
+    const newVcId = 'new_vc_id';
     const newVc = this.jwtService.createCareerVcJwt(
       vcClaims,
-      newVcDid,
+      newVcId,
       careerVcRequestData.holderDid,
     );
 
-    // 3. VC 를 issuer DB 에 저장하고, VC id 를 DID registry 에 등록함
-    this.careerIssuerCertificateService.create(newVcDid);
+    // 3. VC 를 issuer DB 에 저장
+    this.careerIssuerCertificateService.create(newVcId);
 
     return newVc;
   }

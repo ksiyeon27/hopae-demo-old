@@ -22,7 +22,7 @@ export class DidResolverController {
     if (!did) {
       return 'did를 넣어주세용';
     }
-    const result = await this.didResolverService.getPulbicKeyByDid(did);
+    const result = await this.didResolverService.getPublicKeyByDid(did);
     if (result === undefined) {
       return '해당 did에 대한 정보가 없어 퍼블릭키를 가져올 수 없습니다.';
     }
