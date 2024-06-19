@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DockService } from 'src/dock/dock.service';
 import { DockDidUtilService } from 'src/dock/util_service/util.service';
 
