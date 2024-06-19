@@ -3,6 +3,7 @@ import { VerifyCareerVpDTO } from './dto/verify-career-vp.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerVerifierApplicantNonceService } from 'src/career_verifier_applicant_nonce/career_verifier_applicant_nonce.service';
+import { GeneticTestVerifierMemberNonceService } from 'src/genetic_test_verifier_member_nonce/genetic_test_verifier_member_nonce.service';
 
 @Injectable()
 export class VerifierService {
@@ -10,14 +11,24 @@ export class VerifierService {
     readonly jwtService: JwtService,
     readonly didResolverService: DidResolverService,
     readonly careerVerifierApplicantNonceService: CareerVerifierApplicantNonceService,
+    readonly geneticTestVerifierApplicantNonceService: GeneticTestVerifierMemberNonceService,
   ) {}
 
-  requestNonceFromVerifier(holderDid: string): number {
+  requestNonceForCareer(holderDid: string): number {
     // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
     const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
 
     // career_verifier_applicant_nonce 테이블에 저장하기
     this.careerVerifierApplicantNonceService.create(holderDid, nonce);
+    return nonce;
+  }
+
+  requestNonceForGeneticTest(holderDid: string): number {
+    // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
+    const nonce = Math.floor(Math.random() * 2 ** 31 - 1);
+
+    // genetic_test_verifier_member_nonce 테이블에 저장하기
+    this.geneticTestVerifierApplicantNonceService.create(holderDid, nonce);
     return nonce;
   }
 

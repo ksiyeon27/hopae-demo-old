@@ -7,6 +7,7 @@ import { RequestNonceFromVerifierDTO } from './dto/request-nonce-from-verifier';
 export class VerifierController {
   constructor(readonly verifierService: VerifierService) {}
 
+  // career
   @Post('/vp/career')
   async verifyCareerVp(
     @Body() careerVpVerifyData: VerifyCareerVpDTO,
@@ -15,10 +16,27 @@ export class VerifierController {
   }
 
   @Post('/nonce/career')
-  requestNonceFromVerifier(
+  requestNonceForCareer(
     @Body() requestNonceFromVerifierDTO: RequestNonceFromVerifierDTO,
   ): number {
-    return this.verifierService.requestNonceFromVerifier(
+    return this.verifierService.requestNonceForCareer(
+      requestNonceFromVerifierDTO.holderDid,
+    );
+  }
+
+  // genetic-test
+  @Post('/vp/genetic-test')
+  async verifyGeneticTestVp(
+    @Body() careerVpVerifyData: VerifyCareerVpDTO,
+  ): Promise<boolean> {
+    return await this.verifierService.verifyCareerVp(careerVpVerifyData);
+  }
+
+  @Post('/nonce/genetic-test')
+  requestNonceForGeneticTest(
+    @Body() requestNonceFromVerifierDTO: RequestNonceFromVerifierDTO,
+  ): number {
+    return this.verifierService.requestNonceForGeneticTest(
       requestNonceFromVerifierDTO.holderDid,
     );
   }
