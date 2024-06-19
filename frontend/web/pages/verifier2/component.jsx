@@ -13,7 +13,7 @@ export default function Component() {
   const useDeepLink = () => {
     const url = backendHostingURL + "/verifier/vp/genetic-test"; // verifier 2 backend
     const nonceUrl = backendHostingURL + "/verifier/nonce/genetic-test"; // 대신 서버에서 가져와야함
-    const fields = ["name", "age"];
+    const fields = ["hair_loss_gene_heritability"];
     window.open(
       "wwwallet://verify?url=" +
         url +
