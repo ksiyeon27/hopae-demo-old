@@ -27,6 +27,10 @@ import { GeneticTestIssuerTesterNonceModule } from './genetic_test_issuer_tester
 import { GeneticTestIssuerTesterNonceEntity } from './entities/genetic_test_issuer_tester_nonce.entity';
 import { GeneticTestIssuerResultModule } from './genetic_test_issuer_result/genetic_test_issuer_result.module';
 import { GeneticTestIssuerResultEntity } from './entities/genetic_test_issuer_result.entity';
+import { GeneticTestIssuerCertificateModule } from './genetic_test_issuer_certificate/genetic_test_issuer_certificate.module';
+import { GeneticTestIssuerCertificateEntity } from './entities/genetic_test_issuer_certificate.entity';
+import { GeneticTestVerifierMemberNonceModule } from './genetic_test_verifier_member_nonce/genetic_test_verifier_member_nonce.module';
+import { GeneticTestVerifierMemberNonceEntity } from './entities/genetic_test_verifier_member_nonce.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -61,6 +65,8 @@ import { GeneticTestIssuerResultEntity } from './entities/genetic_test_issuer_re
         GeneticTestIssuerMeEntity,
         GeneticTestIssuerResultEntity,
         GeneticTestIssuerTesterNonceEntity,
+        GeneticTestIssuerCertificateEntity,
+        GeneticTestVerifierMemberNonceEntity,
       ],
     }),
     IssuerModule,
@@ -77,6 +83,8 @@ import { GeneticTestIssuerResultEntity } from './entities/genetic_test_issuer_re
     GeneticTestIssuerMeModule,
     GeneticTestIssuerTesterNonceModule,
     GeneticTestIssuerResultModule,
+    GeneticTestIssuerCertificateModule,
+    GeneticTestVerifierMemberNonceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

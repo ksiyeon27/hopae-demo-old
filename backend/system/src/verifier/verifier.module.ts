@@ -4,9 +4,15 @@ import { VerifierService } from './verifier.service';
 import { JwtModule } from 'src/jwt/jwt.module';
 import { DidResolverModule } from 'src/did_resolver/did_resolver.module';
 import { CareerVerifierApplicantNonceModule } from 'src/career_verifier_applicant_nonce/career_verifier_applicant_nonce.module';
+import { GeneticTestVerifierMemberNonceModule } from 'src/genetic_test_verifier_member_nonce/genetic_test_verifier_member_nonce.module';
 
 @Module({
-  imports: [JwtModule, DidResolverModule, CareerVerifierApplicantNonceModule],
+  imports: [
+    JwtModule,
+    DidResolverModule,
+    CareerVerifierApplicantNonceModule,
+    GeneticTestVerifierMemberNonceModule,
+  ],
   controllers: [VerifierController],
   providers: [VerifierService],
 })
