@@ -113,7 +113,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
           </View>
         )}
       </View>
-      <HStack spacing={2}>
+      <HStack>
         <TouchableWithoutFeedback
           onPress={() => {
             Linking.openURL(frontendHostingUrl + '/issuer1');
@@ -125,6 +125,8 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
               borderRadius: 16,
               borderWidth: 2,
               borderColor: '#d0d0d0',
+              flex: 1,
+              marginRight: 16,
             }}>
             <Text style={{ fontSize: 20, color: 'black' }}>
               {'인증서 발급받기(경력)'}
@@ -133,7 +135,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
           onPress={() => {
-            Linking.openURL(frontendHostingUrl + '/issuer1');
+            Linking.openURL(frontendHostingUrl + '/issuer2');
           }}>
           <View
             style={{
@@ -142,6 +144,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
               borderRadius: 16,
               borderWidth: 2,
               borderColor: '#d0d0d0',
+              flex: 1,
             }}>
             <Text style={{ fontSize: 20, color: 'black' }}>
               {'인증서 발급받기(유전자)'}
@@ -149,7 +152,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
           </View>
         </TouchableWithoutFeedback>
       </HStack>
-      <HStack spacing={2}>
+      <HStack>
         <TouchableWithoutFeedback
           onPress={() => {
             Linking.openURL(frontendHostingUrl + '/verifier1');
@@ -161,6 +164,8 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
               borderRadius: 16,
               borderWidth: 2,
               borderColor: '#d0d0d0',
+              flex: 1,
+              marginRight: 16,
             }}>
             <Text style={{ fontSize: 20, color: 'black' }}>
               {'인증하기(경력)'}
@@ -169,7 +174,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
           onPress={() => {
-            Linking.openURL(frontendHostingUrl + '/verifier1');
+            Linking.openURL(frontendHostingUrl + '/verifier2');
           }}>
           <View
             style={{
@@ -178,6 +183,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation, route }) => {
               borderRadius: 16,
               borderWidth: 2,
               borderColor: '#d0d0d0',
+              flex: 1,
             }}>
             <Text style={{ fontSize: 20, color: 'black' }}>
               {'인증하기(유전자)'}
