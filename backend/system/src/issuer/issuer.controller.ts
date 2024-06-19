@@ -73,6 +73,6 @@ export class IssuerController {
 
   @Get('/vc/genetic-test/:id')
   async findGeneticTestVc(@Param('id') vcDid: string): Promise<boolean> {
-    return this.issuerService.findCareerVc(vcDid);
+    return this.issuerService.findGeneticTestVc(vcDid);
   }
 }

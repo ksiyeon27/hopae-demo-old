@@ -79,6 +79,18 @@ export class IssuerService {
     }
   }
 
+  async findGeneticTestVc(vcDid: string): Promise<boolean> {
+    console.log(`==issuerService: findCareerVc ${vcDid} ==`);
+    const certificate =
+      await this.geneticTestIssuerCertificateService.findOneByVcDid(vcDid);
+
+    if (!certificate) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   requestNonceForCareer(holderDid: string): number {
     console.log('==issuerService: requestNonceForCareer==');
     // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
