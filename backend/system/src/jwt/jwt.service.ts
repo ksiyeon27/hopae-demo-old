@@ -153,6 +153,7 @@ export class JwtService {
 
     // 아래는 VP 까지 만드는
 
+    const nonce = ''; // verifier 에게 받은 Nonce 입력
     const holder = await this.getHolderByDid(holderDid);
     const holderSigner = await this.createSigner(holder.privateKey);
 
@@ -168,7 +169,7 @@ export class JwtService {
       //VP 에 추가되는 Payload
       iat: new Date().getTime(), //VP 만든 시각
       aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
-      nonce: '1607437282mock', // 암호화한 난수 - /verifier/nonce/career 응답 + Mock
+      nonce: await holderSigner(nonce), // 암호화한 난수
     };
 
     //SDJWTException: Key Binding Signer not found
@@ -320,7 +321,7 @@ export class JwtService {
     );
 
     // 아래는 VP 까지 만드는
-
+    const nonce = ''; // verifier 에게 받은 Nonce 입력
     const holder = await this.getHolderByDid(holderDid);
     const holderSigner = await this.createSigner(holder.privateKey);
 
@@ -336,7 +337,7 @@ export class JwtService {
       //VP 에 추가되는 Payload
       iat: new Date().getTime(), //VP 만든 시각
       aud: 'https://example.com', //이 VP를 받는 사람 식별자라고 함
-      nonce: '863180503mock', // 암호화한 난수 - /verifier/nonce/genetic-test 응답 + Mock
+      nonce: await holderSigner(nonce), // 암호화한 난수 - /verifier/nonce/genetic-test 응답 + Mock
     };
 
     //SDJWTException: Key Binding Signer not found
@@ -462,21 +463,12 @@ export class JwtService {
   // 이거 일단 임시로 추상화한다고 생각하고 이렇게 만들어놓겠음.
   // 임시로 만들어놓은 방식은 아래 참조
   // 바꿔야 함. 암호화와 같은 알고리즘으로 복호화했을 때 같은지 진짜 확인하기. publicKey 타입 바꾸기
-  _verifyNonceUsingPublicKey(
+  async _verifyNonceUsingPublicKey(
     publicKey: JsonWebKey,
     originalNonce: number,
     encryptedNonce: string,
-  ): boolean {
-    const originalNonceStr = '' + originalNonce;
-    // console.log('==jwtService: _verifyNonceUsingPublicKey==');
-    // console.log(originalNonceStr);
-    // console.log(encryptedNonce);
-
-    // if (originalNonceStr === encryptedNonce) {
-    //   return false;
-    // }
-    // const decrypted = encryptedNonce.replace(publicKey, '');
-    // return decrypted === originalNonceStr;
-    return true;
+  ): Promise<boolean> {
+    const holderVerifier = await this.createVerifier(publicKey);
+    return holderVerifier(originalNonce.toString(), encryptedNonce);
   }
 }
