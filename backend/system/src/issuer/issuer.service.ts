@@ -1,9 +1,12 @@
-import { RequestCareerVcDTO } from './dto/request-career-vc.dto';
+import { RequestVcDTO } from './dto/request-career-vc.dto';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { Claims } from './dto/claims.dto';
+import {
+  CancerClaims,
+  CareerVcClaims,
+  GeneticTestVcClaims,
+} from './dto/claims.dto';
 import { JwtService } from 'src/jwt/jwt.service';
-import { PlayersDidData } from './dto/players-did-data.dto';
 import { DidResolverService } from 'src/did_resolver/did_resolver.service';
 import { CareerIssuerEmployeeService } from 'src/career_issuer_employee/career_issuer_employee.service';
 import { CareerIssuerEmployee } from 'src/entities/career_issuer_employee.entity';
@@ -13,6 +16,8 @@ import { EmployeeData } from './dto/employee-data.dto';
 import { GeneticTestIssuerTesterNonceService } from 'src/genetic_test_issuer_tester_nonce/genetic_test_issuer_tester_nonce.service';
 import { GeneticTestResultData } from './dto/genetic-test-result-data.dto';
 import { GeneticTestIssuerResultService } from 'src/genetic_test_issuer_result/genetic_test_issuer_result.service';
+import { GeneticTestIssuerResult } from 'src/entities/genetic_test_issuer_result.entity';
+import { GeneticTestIssuerCertificateService } from 'src/genetic_test_issuer_certificate/genetic_test_issuer_certificate.service';
 
 @Injectable()
 export class IssuerService {
@@ -24,6 +29,7 @@ export class IssuerService {
     readonly careerIssuerEmployeeNonceService: CareerIssuerEmployeeNonceService,
     readonly geneticTestIssuerTesterNonceService: GeneticTestIssuerTesterNonceService,
     readonly careerIssuerCertificateService: CareerIssuerCertificateService,
+    readonly geneticTestIssuerCertificateService: GeneticTestIssuerCertificateService,
   ) {}
 
   async makeIssuer(issuerDid: string, type: string) {
@@ -73,6 +79,18 @@ export class IssuerService {
     }
   }
 
+  async findGeneticTestVc(vcDid: string): Promise<boolean> {
+    console.log(`==issuerService: findCareerVc ${vcDid} ==`);
+    const certificate =
+      await this.geneticTestIssuerCertificateService.findOneByVcDid(vcDid);
+
+    if (!certificate) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   requestNonceForCareer(holderDid: string): number {
     console.log('==issuerService: requestNonceForCareer==');
     // 난수 발급하고 - 랜덤 정수 (0 이상 2^31-1 미만)
@@ -93,9 +111,7 @@ export class IssuerService {
     return nonce;
   }
 
-  async requestCareerVc(
-    careerVcRequestData: RequestCareerVcDTO,
-  ): Promise<string> {
+  async requestCareerVc(careerVcRequestData: RequestVcDTO): Promise<string> {
     console.log('==issuerService: requestCareerVc==');
 
     // 1. 홀더 검증 : DID resolver API 호출해서 did docs 얻어오고, 난수 복호화 시도
@@ -131,10 +147,10 @@ export class IssuerService {
     }
 
     // 2. VC 생성
-    const vcClaims = this._createVcClaims(employee);
+    const vcClaims = this._createCareerVcClaims(employee);
 
     const newVcDid = 'new_vc_id'; // POST /did/{did}
-    const newVc = this.jwtService.createVcJwt(
+    const newVc = this.jwtService.createCareerVcJwt(
       vcClaims,
       newVcDid,
       careerVcRequestData.holderDid,
@@ -146,14 +162,82 @@ export class IssuerService {
     return newVc;
   }
 
-  _createVcClaims(employee: CareerIssuerEmployee): Claims {
-    //VC 생성 (추후 sd-jwt : issuer 의 pirvate_key 이용)
-    // POST /did/{did}?
-    const claims = new Claims({
+  _createCareerVcClaims(employee: CareerIssuerEmployee): CareerVcClaims {
+    const claims = new CareerVcClaims({
       department: employee.department,
       position: employee.position,
       join: employee.join.toLocaleDateString(),
       leave: employee.leave.toLocaleDateString(),
+    });
+
+    return claims;
+  }
+
+  async requestGeneticTestVc(vcRequestData: RequestVcDTO): Promise<string> {
+    console.log('==issuerService: requestGeneticTestVc==');
+
+    // 1. 홀더 검증 : DID resolver API 호출해서 did docs 얻어오고, 난수 복호화 시도
+    const didDoc = await this.didResolverService.getDidDoc(
+      vcRequestData.holderDid,
+    );
+
+    // 실제로는 public key 담겨있는 공간이 약간 다른데 대충 일단은 여기 있다고 가정하자
+    const publicKey = didDoc.publicKey ?? 'mock';
+    const tester_nonce_entity =
+      await this.geneticTestIssuerTesterNonceService.findOneByDid(
+        vcRequestData.holderDid,
+      );
+    const encryptedNonce = vcRequestData.encryptedNonce;
+
+    const verifyResult = this.jwtService._verifyNonceUsingPublicKey(
+      publicKey,
+      tester_nonce_entity.nonce,
+      encryptedNonce,
+    );
+    if (!verifyResult) {
+      throw new HttpException('pulic key를 통한 난수 verify에 실패함', 400);
+    }
+
+    // issuer DB 에서 genetic_test 가져오기
+    const genetic_test_result =
+      await this.geneticTestIssuerResultService.findOneByDid(
+        vcRequestData.holderDid,
+      );
+    if (!genetic_test_result) {
+      throw new NotFoundException(
+        '해당하는 holder의 유전자 검사 결과 정보를 찾을 수 없습니다.',
+      );
+    }
+
+    // 2. VC 생성
+    const vcClaims = this._createGeneticTestVcClaims(genetic_test_result);
+
+    const newVcDid = 'new_vc_id';
+    const newVc = this.jwtService.createGeneticTestVcJwt(
+      vcClaims,
+      newVcDid,
+      vcRequestData.holderDid,
+    );
+
+    // 3. VC 를 issuer DB 에 저장하고, VC id 를 DID registry 에 등록함
+    this.geneticTestIssuerCertificateService.create(newVcDid);
+
+    return newVc;
+  }
+
+  _createGeneticTestVcClaims(
+    genetic_test_result: GeneticTestIssuerResult,
+  ): GeneticTestVcClaims {
+    const claims = new GeneticTestVcClaims({
+      hair_loss_gene_heritability: genetic_test_result.hairLossGeneHeritability,
+      dermatitis_gene_heritability:
+        genetic_test_result.dermatitisGeneHeritability,
+      cancer_risk: new CancerClaims({
+        liver: genetic_test_result.liverCancerRisk,
+        lungs: genetic_test_result.lungsCancerRisk,
+        pancreas: genetic_test_result.pancreasCancerRisk,
+        stomach: genetic_test_result.stomachCancerRisk,
+      }),
     });
 
     return claims;

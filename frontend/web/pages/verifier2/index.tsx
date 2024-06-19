@@ -26,11 +26,7 @@ const Verifier2Page: FC = () => {
   }, []);
 
   return (
-    <Layout>
-      <Box>
-        <Component />
-      </Box>
-    </Layout>
+    <Component />
   );
 };
 
